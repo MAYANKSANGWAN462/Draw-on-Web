@@ -1344,7 +1344,7 @@
         {
           tag: 'Welcome',
           title: 'Meet Draw on Web',
-          desc: 'Draw, highlight, and annotate right on top of any web page. Here’s what makes it different from every other pen extension — in four quick cards.',
+          desc: 'Draw, highlight, and annotate right on top of any web page. Here’s what makes it different from every other pen extension — in a few quick cards.',
           visual:
             '<div class="dp-g-hero">' +
               `<div class="dp-g-hero-logo">${penLogo}</div>` +
@@ -1392,9 +1392,20 @@
             '</div>'
         },
         {
+          tag: 'Any device',
+          title: 'Mouse, trackpad, or touch',
+          desc: 'Draw on Web <b>detects how you point</b> and adapts to it. Click-drag with a mouse; press-and-glide on a trackpad — <b>two-finger scroll and pinch-to-zoom keep working</b>; or one-finger draw and two-finger scroll on a touchscreen, with bigger touch targets and stylus palm-rejection. It asks once on first run, and you can switch anytime from the toolbar or Settings.',
+          visual:
+            '<div class="dp-g-devices">' +
+              [['mouse', 'Mouse'], ['trackpad', 'Trackpad'], ['touch', 'Touch']]
+                .map(([id, label], i) => `<div class="dp-g-device" style="--d:${i * 110}ms">${inputSvg(id, 26)}<span>${label}</span></div>`).join('') +
+              '<div class="dp-g-device-note">Auto-detected · switch anytime</div>' +
+            '</div>'
+        },
+        {
           tag: 'Make it yours',
-          title: 'Tuned to your taste',
-          desc: 'Themes and accent colors, toolbar size, shape and position, a custom color palette, adjustable stroke smoothing, PNG export, and auto-restore of your drawings. <button type="button" class="dp-g-link" data-action="settings">Open Settings</button> to dial it in.',
+          title: 'A toolbar that fits you',
+          desc: 'Shape the bar to your workflow — <b>size, corner shape, colour, position</b>, and which tools appear (and in what order). Drag it anywhere or collapse it to a puck; it even <b>compacts itself</b> on narrow windows. Plus themes and accents, a custom palette, stroke smoothing, PNG export, and auto-restore. <button type="button" class="dp-g-link" data-action="settings">Open Settings</button> to dial it in.',
           visual:
             '<div class="dp-g-custom">' +
               '<div class="dp-g-swatches">' +

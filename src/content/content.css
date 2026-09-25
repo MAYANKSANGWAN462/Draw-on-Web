@@ -877,6 +877,35 @@
 }
 @keyframes dp-g-pop { to { opacity: 1; transform: translateY(0) scale(1); } }
 
+/* --- slide: any device (mouse / trackpad / touch) --- */
+.dp-g-devices {
+  display: flex; flex-wrap: wrap; gap: 14px;
+  align-items: flex-end; justify-content: center;
+  padding: 6px;
+}
+.dp-g-device {
+  display: flex; flex-direction: column; align-items: center; gap: 9px;
+  width: 82px; padding: 15px 8px;
+  color: var(--dp-fg);
+  background: var(--dp-bg);
+  border: 1px solid var(--dp-border);
+  border-radius: 14px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.18);
+  opacity: 0;
+  transform: translateY(8px) scale(0.9);
+  animation: dp-g-pop 420ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: var(--d, 0ms);
+}
+.dp-g-device svg { display: block; width: 26px; height: 26px; }
+.dp-g-device span { font-size: 11.5px; font-weight: 600; }
+.dp-g-device-note {
+  flex-basis: 100%;
+  text-align: center;
+  margin-top: 2px;
+  font-size: 11px; font-weight: 650;
+  color: var(--dp-accent);
+}
+
 /* --- slide 4: customisation --- */
 .dp-g-custom { display: flex; flex-direction: column; gap: 16px; width: 78%; }
 .dp-g-swatches { display: flex; gap: 8px; justify-content: center; }
@@ -915,9 +944,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .dp-guide2-slide, .dp-g-draw, .dp-g-draw2, .dp-g-hero-logo, .dp-g-scroll,
-  .dp-g-tool, .dp-g-swatches span, .dp-g-ready-logo { animation: none !important; transition: none !important; }
+  .dp-g-tool, .dp-g-device, .dp-g-swatches span, .dp-g-ready-logo { animation: none !important; transition: none !important; }
   .dp-guide2-slide.from-left, .dp-guide2-slide.from-right { opacity: 1; transform: none; }
-  .dp-g-tool, .dp-g-swatches span { opacity: 1; transform: none; }
+  .dp-g-tool, .dp-g-device, .dp-g-swatches span { opacity: 1; transform: none; }
   .dp-g-draw { stroke-dashoffset: 0; }
 }
 
