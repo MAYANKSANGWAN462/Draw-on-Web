@@ -1488,6 +1488,11 @@
       // Enter / Esc drive its navigation), so keep the canvas keys out of the way
       // while it's open and let that handler own the keyboard.
       if (self._guide) return;
+      // In native fullscreen (e.g. a fullscreen video) our overlay isn't on screen
+      // and the keyboard belongs entirely to the page/browser — Esc exits, F/J/L
+      // drive the player. Claim nothing until fullscreen is left, so exiting
+      // fullscreen never doubles as "turn drawing off".
+      if (document.fullscreenElement) return;
       // While the confirm dialog is open, keep keys out of the canvas.
       if (self._modal) {
         if (e.key === 'Escape') { self._modal.querySelector('.dp-cancel').click(); e.preventDefault(); }
@@ -1525,10 +1530,47 @@
       if (mod && (e.key === 'y' || e.key === 'Y')) { self._clearSelection(); self.engine.redo(); e.preventDefault(); return; }
       if (mod) return;
 
+      // On pages that drive themselves from the keyboard (video players like
+      // YouTube: F = fullscreen, J/L = seek, M = mute, C = captions, T = theater…)
+      // a bare letter belongs to the SITE, not our tool shortcuts. If we grabbed it
+      // — and called preventDefault — the page's own handler would see the event as
+      // already handled and do nothing, which is exactly why F wouldn't go
+      // fullscreen while drawing. So yield every single-key shortcut on those pages
+      // and let the site keep its keys; tools are still one click away on the
+      // toolbar, and the pen still draws with the pointer. Ordinary pages (no
+      // prominent media) keep the single-key hotkeys unchanged.
+      if (self._hostHandlesKeys()) return;
+
       const k = e.key.toLowerCase();
       if (k === 'c') { self.setInteractive(!self.interactive); e.preventDefault(); return; }
       if (HOTKEYS[k]) { self.selectTool(HOTKEYS[k]); e.preventDefault(); }
     },
+
+    // True when the page itself is likely listening for bare-letter keyboard
+    // shortcuts, so we should NOT claim single keys as tool hotkeys. Signals: an
+    // active native fullscreen, or a <video>/<audio> that's playing or a paused
+    // video still shown prominently on screen (a paused YouTube player still owns
+    // F/J/L). Kept cheap since it runs per keydown; permissive on any error.
+    _hostHandlesKeys() {
+      try {
+        if (document.fullscreenElement) return true;
+        const media = document.querySelectorAll('video, audio');
+        const vw = window.innerWidth, vh = window.innerHeight;
+        for (const m of media) {
+          if (!m.paused) return true;                       // actively playing
+          if (m.tagName === 'AUDIO') {
+            if (m.currentTime > 0 || m.controls) return true;
+            continue;
+          }
+          // Paused but prominent, on-screen video (e.g. a paused player).
+          const r = m.getBoundingClientRect();
+          const onScreen = r.bottom > 0 && r.top < vh && r.right > 0 && r.left < vw;
+          if (onScreen && r.width >= 200 && r.height >= 120) return true;
+        }
+      } catch (_e) { /* be permissive — never let detection break key handling */ }
+      return false;
+    },
+
     _onKeyUp(e) {
       const self = window.__drawingPen;
       if (e.key === 'Shift') self._shiftDown = false;
