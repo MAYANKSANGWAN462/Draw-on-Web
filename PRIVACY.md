@@ -52,7 +52,7 @@ Uninstalling the extension removes all locally stored data.
 
 ## Contact
 
-Questions about this policy can be sent to: **mayanksangwan7070@gmail.com**
+Questions about this policy can be sent to: **mayanksangwan462@gmail.com**
 
 _This policy may be updated if the extension's functionality changes. Any material
 change will be reflected in the "Last updated" date above._
