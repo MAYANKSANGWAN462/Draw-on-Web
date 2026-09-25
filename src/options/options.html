@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Draw on Web — Settings</title>
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <div class="bg-grid" aria-hidden="true"></div>
+  <main class="wrap">
+    <header class="head">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round" width="24" height="24">
+            <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <div class="eyebrow">Studio settings</div>
+          <h1>Draw on Web</h1>
+          <p class="sub">Tune your instrument. Everything here syncs across your Chrome installs.</p>
+        </div>
+      </div>
+      <span class="saved" id="savedTag" hidden><span class="saved-dot"></span>Saved</span>
+    </header>
+
+    <!-- Toolbar style (hero: live specimen of the on-page bar) -->
+    <section class="card">
+      <div class="card-head">
+        <h2>The toolbar</h2>
+        <p class="hint">Shape the on-page bar — its size, its corners, its color.</p>
+      </div>
+
+      <figure class="tb-preview-wrap">
+        <div class="tb-preview" id="tbPreview" aria-hidden="true">
+          <span class="tb-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg></span>
+          <span class="tb-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="20" y1="4" x2="4" y2="20"/></svg></span>
+          <span class="tb-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/></svg></span>
+          <span class="tb-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/></svg></span>
+          <span class="tb-dot"></span>
+          <span class="tb-btn tb-accent"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg></span>
+        </div>
+        <figcaption class="tb-caption">Live preview</figcaption>
+      </figure>
+
+      <div class="row">
+        <label>Toolbar size</label>
+        <div class="segmented" id="toolbarSize" role="radiogroup" aria-label="Toolbar size">
+          <button type="button" data-size="compact" role="radio">Compact</button>
+          <button type="button" data-size="regular" role="radio">Regular</button>
+          <button type="button" data-size="large" role="radio">Large</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <label>Corner shape</label>
+        <div class="segmented" id="toolbarRadius" role="radiogroup" aria-label="Corner shape">
+          <button type="button" data-radius="sharp" role="radio">Sharp</button>
+          <button type="button" data-radius="rounded" role="radio">Rounded</button>
+          <button type="button" data-radius="pill" role="radio">Pill</button>
+        </div>
+      </div>
+
+      <div class="row switch-row">
+        <div>
+          <label for="toolbarColorOn">Custom toolbar color</label>
+          <p class="hint">Override the theme background. Text contrast adjusts automatically.</p>
+        </div>
+        <div class="color-toggle">
+          <input type="color" id="toolbarColor" class="custom-color" aria-label="Toolbar color" />
+          <label class="switch">
+            <input type="checkbox" id="toolbarColorOn" />
+            <span class="track"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="row switch-row">
+        <div>
+          <label for="showSizeSlider">Show thickness slider on the toolbar</label>
+          <p class="hint">A quick size control right on the bar, without opening the color popover.</p>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="showSizeSlider" />
+          <span class="track"></span>
+        </label>
+      </div>
+    </section>
+
+    <!-- Tools -->
+    <section class="card">
+      <div class="card-head">
+        <h2>Tools</h2>
+        <p class="hint">Toggle what appears on the bar, and drag the grips to reorder.</p>
+      </div>
+      <ul class="tool-list" id="toolList"></ul>
+    </section>
+
+    <!-- Defaults -->
+    <section class="card">
+      <div class="card-head">
+        <h2>Defaults</h2>
+        <p class="hint">Where every new drawing session starts.</p>
+      </div>
+
+      <div class="row">
+        <label for="defaultTool">Default tool on startup</label>
+        <select id="defaultTool"></select>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="textFont">Text font</label>
+          <p class="hint">Font for the text tool. New text uses this; existing text keeps the font it was created with.</p>
+        </div>
+        <select id="textFont"></select>
+      </div>
+
+      <div class="row">
+        <label>Default color</label>
+        <div class="palette" id="palette"></div>
+        <input type="color" id="customColor" class="custom-color" aria-label="Custom default color" />
+      </div>
+
+      <div class="row">
+        <label for="defaultThickness">Default thickness</label>
+        <div class="slider-cell">
+          <input type="range" id="defaultThickness" min="1" max="20" step="1" />
+          <span class="val" id="thicknessVal">4</span><span class="unit">px</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <label for="defaultOpacity">Default opacity</label>
+        <div class="slider-cell">
+          <input type="range" id="defaultOpacity" min="5" max="100" step="5" />
+          <span class="val" id="opacityVal">100</span><span class="unit">%</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <label for="defaultPosition">Default toolbar position</label>
+        <select id="defaultPosition">
+          <option value="tc">Top-center</option>
+          <option value="tr">Top-right</option>
+          <option value="tl">Top-left</option>
+          <option value="bc">Bottom-center</option>
+          <option value="br">Bottom-right</option>
+          <option value="bl">Bottom-left</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- Appearance -->
+    <section class="card">
+      <div class="card-head">
+        <h2>Appearance</h2>
+        <p class="hint">How the on-page toolbar and dialogs are themed.</p>
+      </div>
+      <div class="row">
+        <label>Theme</label>
+        <div class="segmented" id="theme" role="radiogroup" aria-label="Theme">
+          <button type="button" data-theme="auto" role="radio">Auto</button>
+          <button type="button" data-theme="light" role="radio">Light</button>
+          <button type="button" data-theme="dark" role="radio">Dark</button>
+        </div>
+      </div>
+      <div class="row">
+        <label for="accentColor">Accent color</label>
+        <input type="color" id="accentColor" class="custom-color" aria-label="Accent color" />
+      </div>
+    </section>
+
+    <!-- Behavior -->
+    <section class="card">
+      <div class="card-head">
+        <h2>Behavior</h2>
+        <p class="hint">How strokes are drawn, exported, and kept.</p>
+      </div>
+      <div class="row">
+        <label>Pen smoothing</label>
+        <div class="segmented" id="smoothing" role="radiogroup" aria-label="Pen smoothing">
+          <button type="button" data-sm="0" role="radio">Off</button>
+          <button type="button" data-sm="0.3" role="radio">Low</button>
+          <button type="button" data-sm="0.5" role="radio">Medium</button>
+          <button type="button" data-sm="0.7" role="radio">High</button>
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Export PNG</label>
+          <p class="hint"><b>Visible area</b> captures what's on screen. <b>Full page</b> renders every stroke across the whole page, so nothing off-screen is lost.</p>
+        </div>
+        <div class="segmented" id="exportMode" role="radiogroup" aria-label="Export mode">
+          <button type="button" data-mode="viewport" role="radio">Visible area</button>
+          <button type="button" data-mode="full" role="radio">Full page</button>
+        </div>
+      </div>
+      <div class="row switch-row">
+        <div>
+          <label for="autoRestore">Auto-restore drawings when I revisit a page</label>
+          <p class="hint">Saves annotations per URL on this device. Off by default.</p>
+        </div>
+        <label class="switch">
+          <input type="checkbox" id="autoRestore" />
+          <span class="track"></span>
+        </label>
+      </div>
+      <div class="row switch-row">
+        <div>
+          <label>Saved drawings</label>
+          <p class="hint">Remove every annotation Draw on Web has stored on this device.</p>
+        </div>
+        <button type="button" class="btn danger" id="clearDrawingsBtn">Clear saved drawings</button>
+      </div>
+    </section>
+
+    <!-- Shortcuts -->
+    <section class="card">
+      <div class="card-head">
+        <h2>Keyboard shortcuts</h2>
+        <p class="hint">Available while Draw on Web is active on a page.</p>
+      </div>
+      <ul class="shortcuts" id="shortcuts"></ul>
+    </section>
+
+    <footer class="foot">
+      <p class="foot-note">Changes save automatically.</p>
+      <button type="button" class="btn danger" id="resetBtn">Reset to defaults</button>
+    </footer>
+  </main>
+
+  <script src="options.js"></script>
+</body>
+</html>
