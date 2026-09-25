@@ -211,6 +211,25 @@
   text-align: center;
 }
 
+/* ---- responsive auto-fit (narrow / resized windows) ----
+   Applied by the toolbar in JS when the bar would otherwise wrap onto a second
+   row, so it stays a tidy single row that's still usable. `!important` beats the
+   inline size vars the toolbar sets from the chosen size — intentionally, and
+   only while the class is present (it's removed again when the window widens).
+   Two steps: `-compact` shrinks buttons/gaps; `-min` also drops the inline
+   thickness slider (still available in the colour popover). */
+.dp-toolbar.dp-fit-compact {
+  --dp-btn: 30px !important;
+  --dp-icon: 17px !important;
+  --dp-gap: 2px !important;
+  --dp-pad: 4px 5px !important;
+}
+.dp-toolbar.dp-fit-compact .dp-vr { margin: 4px 3px; }
+.dp-toolbar.dp-fit-compact .dp-size-range { width: 58px; }
+.dp-toolbar.dp-fit-compact .dp-size { padding: 0 4px 0 2px; gap: 5px; }
+.dp-toolbar.dp-fit-min .dp-size { display: none !important; }
+.dp-toolbar.dp-fit-min .dp-vr { margin: 4px 2px; }
+
 /* ---- small screens (phones / very narrow windows) ---- */
 /* The bar already flex-wraps and is width-capped, so it can never overflow the
    viewport; here we also shrink it to a compact, still touch-friendly panel so
@@ -495,6 +514,135 @@
 .dp-modal-btn.dp-confirm { background: var(--dp-accent); border-color: transparent; color: #fff; }
 .dp-modal-btn.dp-confirm.danger { background: #ef4444; }
 .dp-modal-btn:focus-visible { outline: 2px solid var(--dp-accent); outline-offset: 2px; }
+
+/* ---- input-device switcher menu (toolbar) ---- */
+.dp-menu {
+  position: fixed;
+  z-index: 2147483647;
+  --dp-accent: #f97316;
+  --dp-bg: rgba(26, 26, 32, 0.98);
+  --dp-fg: #f5f5f7;
+  --dp-fg-dim: #a1a1aa;
+  --dp-border: rgba(255, 255, 255, 0.16);
+  --dp-hover: rgba(255, 255, 255, 0.14);
+  --dp-ring: rgba(0, 0, 0, 0.55);
+  --dp-hi: rgba(255, 255, 255, 0.08);
+  width: 244px;
+  padding: 7px;
+  color: var(--dp-fg);
+  background: var(--dp-bg);
+  border: 1px solid var(--dp-border);
+  border-radius: 14px;
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.42), 0 2px 8px rgba(0, 0, 0, 0.30), 0 0 0 1px var(--dp-ring), inset 0 1px 0 var(--dp-hi);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  animation: dp-pop 130ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.dp-menu * { box-sizing: border-box; }
+.dp-menu-title {
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--dp-fg-dim); padding: 5px 8px 7px;
+}
+.dp-menu-item {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 9px;
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--dp-fg);
+  transition: background 110ms ease;
+}
+.dp-menu-item:hover { background: var(--dp-hover); }
+.dp-menu-item:focus-visible { outline: 2px solid var(--dp-accent); outline-offset: -2px; }
+.dp-menu-ico {
+  flex: 0 0 auto;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  color: var(--dp-fg);
+  background: var(--dp-hover);
+}
+.dp-menu-item.is-active .dp-menu-ico { background: var(--dp-accent); color: #fff; }
+.dp-menu-ico svg { display: block; width: 18px; height: 18px; }
+.dp-menu-text { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
+.dp-menu-name { font-size: 13px; font-weight: 600; }
+.dp-menu-hint { font-size: 11px; color: var(--dp-fg-dim); }
+.dp-menu-check { flex: 0 0 auto; color: var(--dp-accent); opacity: 0; }
+.dp-menu-item.is-active .dp-menu-check { opacity: 1; }
+
+/* ---- first-run input-device picker ---- */
+.dp-input-picker {
+  width: 560px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 48px);
+  overflow: auto;
+  padding: 26px 24px 20px;
+  color: var(--dp-fg);
+  background: var(--dp-bg);
+  border: 1px solid var(--dp-border);
+  border-radius: 20px;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5), inset 0 1px 0 var(--dp-hi);
+  animation: dp-pop 200ms cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: center;
+}
+.dp-ip-title { font-size: 21px; font-weight: 750; letter-spacing: -0.01em; }
+.dp-ip-sub {
+  font-size: 13px; line-height: 1.55; color: var(--dp-fg-dim);
+  margin: 7px auto 20px; max-width: 440px;
+}
+.dp-ip-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; text-align: left; }
+.dp-ip-card {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 14px;
+  border-radius: 15px;
+  border: 1px solid var(--dp-border);
+  background: var(--dp-hover);
+  cursor: pointer;
+  transition: transform 120ms cubic-bezier(0.16, 1, 0.3, 1), border-color 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+.dp-ip-card:hover { transform: translateY(-3px); border-color: var(--dp-accent); box-shadow: 0 10px 26px rgba(0, 0, 0, 0.28); }
+.dp-ip-card:focus-visible { outline: 2px solid var(--dp-accent); outline-offset: 2px; }
+.dp-ip-card.is-suggested { border-color: color-mix(in srgb, var(--dp-accent) 55%, transparent); }
+.dp-ip-ico {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 48px; height: 48px;
+  border-radius: 13px;
+  color: #fff;
+  background: linear-gradient(140deg, var(--dp-accent), color-mix(in srgb, var(--dp-accent) 55%, #a855f7));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.dp-ip-name {
+  display: flex; align-items: center; gap: 7px; flex-wrap: wrap;
+  font-size: 15px; font-weight: 700;
+}
+.dp-ip-name em {
+  font-style: normal; font-size: 10px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--dp-accent); background: color-mix(in srgb, var(--dp-accent) 16%, transparent);
+  padding: 2px 7px; border-radius: 999px;
+}
+.dp-ip-desc { font-size: 12px; line-height: 1.5; color: var(--dp-fg-dim); }
+.dp-ip-skip {
+  margin-top: 18px;
+  border: 0; background: transparent;
+  color: var(--dp-fg-dim);
+  font: inherit; font-size: 12.5px; font-weight: 600;
+  cursor: pointer; padding: 8px 12px; border-radius: 9px;
+  transition: background 120ms ease, color 120ms ease;
+}
+.dp-ip-skip:hover { background: var(--dp-hover); color: var(--dp-fg); }
+
+@media (max-width: 560px) {
+  .dp-ip-grid { grid-template-columns: 1fr; }
+  .dp-ip-card { flex-direction: row; align-items: center; }
+  .dp-ip-ico { flex: 0 0 auto; width: 42px; height: 42px; }
+}
 
 /* ---- quick guide (onboarding) ---- */
 .dp-guide {
@@ -805,6 +953,7 @@
 @media (prefers-color-scheme: light) {
   .dp-toolbar:not(.dp-theme-dark),
   .dp-popover:not(.dp-theme-dark),
+  .dp-menu:not(.dp-theme-dark),
   .dp-modal-overlay:not(.dp-theme-dark) {
     --dp-bg: rgba(252, 252, 253, 0.98);
     --dp-fg: #1c1c1f;

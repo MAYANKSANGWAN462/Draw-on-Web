@@ -408,13 +408,16 @@
     }
 
     // ---- selection queries + transforms ----------------------------------
-    hitTest(p) { return this._hitTest(p); }
+    // `extra` widens the grab radius (px) — coarse pointers (trackpad / touch)
+    // pass a larger value so thin strokes stay easy to select.
+    hitTest(p, extra = 0) { return this._hitTest(p, extra); }
 
-    // Topmost TEXT stroke hit by p, or -1 (used for double-click-to-edit).
-    hitTestText(p) {
+    // Topmost TEXT stroke hit by p, or -1 (used for double-click-to-edit and the
+    // Text tool's grab). `extra` widens the hit for coarse pointers.
+    hitTestText(p, extra = 0) {
       for (let i = this.strokes.length - 1; i >= 0; i--) {
         const s = this.strokes[i];
-        if (s.type === 'text' && this._strokeHit(s, p, 0)) return i;
+        if (s.type === 'text' && this._strokeHit(s, p, extra)) return i;
       }
       return -1;
     }

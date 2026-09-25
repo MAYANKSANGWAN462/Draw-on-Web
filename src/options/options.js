@@ -11,7 +11,8 @@ const DEFAULT_SETTINGS = {
   defaultThickness: 4,
   defaultOpacity: 1,
   defaultTool: 'pen',
-  textFont: 'sans',
+  textFont: 'mono',
+  inputMode: 'auto',
   defaultPosition: 'tc',
   theme: 'auto',
   toolbarColor: '',
@@ -36,12 +37,18 @@ const FONT_STACKS = {
   hand: '"Segoe Print", "Comic Sans MS", "Bradley Hand", "Chalkboard SE", cursive'
 };
 const FONT_LABELS = {
-  sans: 'Sans-serif (default)',
+  sans: 'Sans-serif',
   serif: 'Serif',
-  mono: 'Monospace',
+  mono: 'Monospace (default)',
   rounded: 'Rounded',
   hand: 'Handwritten'
 };
+
+// Platform-aware modifier label so shortcuts read ⌘ on macOS, Ctrl elsewhere.
+const IS_MAC = /mac|iphone|ipad|ipod/i.test(
+  (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || navigator.userAgent || ''
+);
+const MOD = IS_MAC ? '⌘' : 'Ctrl';
 
 const TOOL_LABELS = {
   select: 'Select', pen: 'Pen', highlighter: 'Highlighter', line: 'Line', rect: 'Rectangle',
@@ -155,6 +162,7 @@ function render() {
   $('defaultOpacity').value = opPct;
   $('opacityVal').textContent = opPct;
   $('defaultPosition').value = settings.defaultPosition;
+  $('inputMode').value = settings.inputMode || 'auto';
   $('autoRestore').checked = settings.autoRestore;
   $('accentColor').value = settings.accentColor;
   renderTheme();
@@ -235,13 +243,13 @@ function renderExportMode() {
 }
 
 const SHORTCUTS = [
-  ['Ctrl+Shift+D', 'Toggle Draw on Web'],
+  [`${MOD}+Shift+D`, 'Toggle Draw on Web'],
   ['P / H', 'Pen / Highlighter'],
   ['L / R / O', 'Line / Rectangle / Ellipse'],
   ['A / T / N', 'Arrow / Text / Number stamp'],
   ['S / E', 'Select / Eraser'],
   ['C', 'Cursor mode (use the site)'],
-  ['Ctrl+Z / Ctrl+Shift+Z', 'Undo / Redo'],
+  [`${MOD}+Z / ${MOD}+Shift+Z`, 'Undo / Redo'],
   ['Delete', 'Delete selection'],
   ['Shift', 'Hold while drawing: square / circle / 45°'],
   ['Esc', 'Cancel, deselect, or exit']
@@ -385,6 +393,8 @@ function wireControls() {
   });
 
   $('defaultPosition').addEventListener('change', (e) => { settings.defaultPosition = e.target.value; save(); });
+
+  $('inputMode').addEventListener('change', (e) => { settings.inputMode = e.target.value; save(); });
 
   $('autoRestore').addEventListener('change', (e) => { settings.autoRestore = e.target.checked; save(); });
 

@@ -21,6 +21,30 @@
     hand: '"Segoe Print", "Comic Sans MS", "Bradley Hand", "Chalkboard SE", cursive'
   };
 
+  // ---- platform detection ----------------------------------------------
+  // Used to show the right modifier keys (⌘/⌥ on macOS, Ctrl/Alt elsewhere) in
+  // tooltips, the welcome tour, and the options page. Prefer the modern
+  // userAgentData.platform; fall back to the (deprecated) navigator.platform and
+  // finally the UA string so old and new engines both resolve correctly.
+  const _plat = (
+    (navigator.userAgentData && navigator.userAgentData.platform) ||
+    navigator.platform || navigator.userAgent || ''
+  );
+  const IS_MAC = /mac|iphone|ipad|ipod/i.test(_plat);
+  const MOD_LABEL = IS_MAC ? '⌘' : 'Ctrl';     // primary accelerator
+  const ALT_LABEL = IS_MAC ? '⌥' : 'Alt';      // secondary modifier (brush size)
+  const SHIFT_LABEL = IS_MAC ? '⇧' : 'Shift';
+
+  // Turn a token string into a platform-correct label. Tokens: "Mod" (Ctrl/⌘),
+  // "Alt" (Alt/⌥), "Shift" (Shift/⇧). Everything else is passed through as-is,
+  // so `keyLabel('Mod+Shift+D')` -> "Ctrl+Shift+D" or "⌘+⇧+D".
+  function keyLabel(combo) {
+    return String(combo)
+      .replace(/\bMod\b/g, MOD_LABEL)
+      .replace(/\bAlt\b/g, ALT_LABEL)
+      .replace(/\bShift\b/g, SHIFT_LABEL);
+  }
+
   // Master list of tools (id + default visibility + default order).
   const ALL_TOOLS = ['select', 'pen', 'highlighter', 'line', 'rect', 'ellipse', 'arrow', 'text', 'counter', 'eraser', 'rectFill', 'ellipseFill'];
   // Tools present but hidden from the toolbar by default (enable in Settings).
@@ -32,7 +56,12 @@
     defaultThickness: 4,
     defaultOpacity: 1,
     defaultTool: 'pen',
-    textFont: 'sans',         // font family key for the text tool (see FONT_STACKS)
+    textFont: 'mono',         // font family key for the text tool (see FONT_STACKS)
+    inputMode: 'auto',        // 'auto' | 'mouse' | 'trackpad' | 'touch' — how you
+                              // point/draw. Tunes hit tolerances + gestures so the
+                              // same tools feel right on a mouse, a laptop
+                              // trackpad, or a touchscreen. 'auto' picks touch on
+                              // coarse/no-hover devices, otherwise mouse.
     defaultPosition: 'tc',    // 'tc' | 'tr' | 'tl' | 'bc' | 'br' | 'bl'
     theme: 'auto',            // 'auto' | 'light' | 'dark'
     toolbarColor: '',         // '' = follow theme; else a custom bar background
@@ -71,6 +100,13 @@
     ALL_TOOLS,
     FONT_STACKS,
     DEFAULT_SETTINGS,
+
+    // ---- platform ---------------------------------------------------------
+    IS_MAC,
+    MOD_LABEL,
+    ALT_LABEL,
+    SHIFT_LABEL,
+    keyLabel,
 
     // ---- sync (user settings) --------------------------------------------
     async getSettings() {

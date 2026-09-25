@@ -38,7 +38,19 @@
     exit: '<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
     grip: '<circle cx="9" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="18" r="1"/>',
     collapse: '<path d="m15 18-6-6 6-6"/>',
-    help: '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>'
+    help: '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>',
+    inputAuto: '<path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/>',
+    inputMouse: '<rect x="5" y="2" width="14" height="20" rx="7"/><path d="M12 6v4"/>',
+    inputTrackpad: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 14h18"/><path d="M11 17.5h2"/>',
+    inputTouch: '<path d="M18 11.5V9a2 2 0 0 0-4 0"/><path d="M14 10V8a2 2 0 0 0-4 0v1"/><path d="M10 9V5a2 2 0 0 0-4 0v9"/><path d="M18 11a2 2 0 1 1 4 0v3a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>'
+  };
+
+  // Input-mode metadata for the switcher (menu label + short helper line).
+  const INPUT_META = {
+    auto: { label: 'Auto-detect', hint: 'Choose for me', icon: 'inputAuto' },
+    mouse: { label: 'Mouse', hint: 'Click and drag', icon: 'inputMouse' },
+    trackpad: { label: 'Trackpad', hint: 'Press & glide · pinch to zoom', icon: 'inputTrackpad' },
+    touch: { label: 'Touchscreen', hint: 'One finger draws · two scroll', icon: 'inputTouch' }
   };
 
   const TOOL_META = {
@@ -85,6 +97,7 @@
       this._applyTheme(this.settings.theme);
       this._applyAccent(this.settings.accentColor);
       this._applyAppearance(this.settings);
+      this._fitToViewport();
 
       const pos = saved.position || this._cornerToPos(this.settings.defaultPosition);
       this._setPosition(pos);
@@ -104,7 +117,8 @@
       this.root && this.root.remove();
       this.puck && this.puck.remove();
       this.popover && this.popover.remove();
-      this.root = this.puck = this.popover = null;
+      this.inputMenu && this.inputMenu.remove();
+      this.root = this.puck = this.popover = this.inputMenu = null;
     }
 
     applySettings(settings) {
@@ -114,6 +128,12 @@
       this._applyAppearance(settings);
       this._rebuildTools();
       this._rebuildPalette();
+      // Tool count / size may have changed the bar's width — re-fit and re-clamp.
+      this._fitToViewport();
+      if (this.root && !this.collapsed) {
+        const r = this.root.getBoundingClientRect();
+        this._setPosition({ left: r.left, top: r.top });
+      }
       this.refresh();
     }
 
@@ -181,8 +201,8 @@
       // History.
       const hist = document.createElement('div');
       hist.className = 'dp-group';
-      this._undoBtn = this._iconButton('undo', 'Undo (Ctrl+Z)', () => this.api.undo());
-      this._redoBtn = this._iconButton('redo', 'Redo (Ctrl+Shift+Z)', () => this.api.redo());
+      this._undoBtn = this._iconButton('undo', `Undo (${Storage.keyLabel('Mod+Z')})`, () => this.api.undo());
+      this._redoBtn = this._iconButton('redo', `Redo (${Storage.keyLabel('Mod+Shift+Z')})`, () => this.api.redo());
       this._clearBtn = this._iconButton('clear', 'Clear all', () => this.api.clear());
       hist.append(this._undoBtn, this._redoBtn, this._clearBtn);
       root.appendChild(hist);
@@ -198,8 +218,14 @@
       this._cursorBtn = this._iconButton('cursor', 'Cursor — use the site (C)', () => {
         this.api.setInteractive(!this.api.getState().interactive);
       });
+      // Input-device switcher: icon reflects the active mode; click opens a menu.
+      this._inputBtn = this._iconButton('inputMouse', 'Input device', (e) => {
+        e && e.stopPropagation();
+        this._toggleInputMenu();
+      });
       meta.append(
         this._cursorBtn,
+        this._inputBtn,
         this._iconButton('export', 'Export PNG', () => this.api.exportPng()),
         this._iconButton('help', 'Quick guide', () => this.api.openGuide()),
         this._iconButton('settings', 'Settings', () => this.api.openSettings())
@@ -221,6 +247,7 @@
       this.root = root;
 
       this._buildPopover();
+      this._buildInputMenu();
 
       // Collapsed puck.
       const puck = document.createElement('button');
@@ -384,6 +411,81 @@
           this._togglePopover(false);
         }
       }
+      if (this.inputMenu && this.inputMenu.style.display !== 'none') {
+        if (!this.inputMenu.contains(e.target) && !this._inputBtn.contains(e.target)) {
+          this._toggleInputMenu(false);
+        }
+      }
+    }
+
+    // ---- input-device switcher menu -------------------------------------
+    _buildInputMenu() {
+      const menu = document.createElement('div');
+      menu.className = 'dp-menu';
+      menu.setAttribute('role', 'menu');
+      menu.style.display = 'none';
+      menu.addEventListener('pointerdown', (e) => e.stopPropagation());
+      menu.innerHTML =
+        '<div class="dp-menu-title">Input device</div>' +
+        ['auto', 'mouse', 'trackpad', 'touch'].map((id) => {
+          const m = INPUT_META[id];
+          return `<button type="button" class="dp-menu-item" role="menuitemradio" data-mode="${id}">` +
+            `<span class="dp-menu-ico">${svg(m.icon)}</span>` +
+            `<span class="dp-menu-text"><span class="dp-menu-name">${m.label}</span>` +
+            `<span class="dp-menu-hint">${m.hint}</span></span>` +
+            '<span class="dp-menu-check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M20 6 9 17l-5-5"/></svg></span>' +
+          '</button>';
+        }).join('');
+      menu.querySelectorAll('.dp-menu-item').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          this.api.setInputMode(btn.dataset.mode);
+          this._toggleInputMenu(false);
+          this.refresh();
+        });
+      });
+      document.documentElement.appendChild(menu);
+      this.inputMenu = menu;
+    }
+
+    _toggleInputMenu(force) {
+      if (!this.inputMenu) return;
+      const show = force != null ? force : this.inputMenu.style.display === 'none';
+      if (show) {
+        this._togglePopover(false);
+        this._refreshInputMenu();
+        this._positionInputMenu();
+        this.inputMenu.style.display = 'block';
+        this._inputBtn.classList.add('is-active');
+      } else {
+        this.inputMenu.style.display = 'none';
+        this._inputBtn.classList.remove('is-active');
+      }
+    }
+
+    _positionInputMenu() {
+      const r = this._inputBtn.getBoundingClientRect();
+      const menu = this.inputMenu;
+      menu.style.visibility = 'hidden';
+      menu.style.display = 'block';
+      const mw = menu.offsetWidth, mh = menu.offsetHeight;
+      let left = r.left + r.width / 2 - mw / 2;
+      let top = r.bottom + 8;
+      if (top + mh > window.innerHeight - 8) top = r.top - mh - 8; // flip up
+      left = Math.max(8, Math.min(left, window.innerWidth - mw - 8));
+      menu.style.left = left + 'px';
+      menu.style.top = Math.max(8, top) + 'px';
+      menu.style.visibility = '';
+    }
+
+    // Tick the stored choice (which may be 'auto') in the menu.
+    _refreshInputMenu() {
+      if (!this.inputMenu || !this.api.getInputModeSetting) return;
+      const cur = this.api.getInputModeSetting();
+      this.inputMenu.querySelectorAll('.dp-menu-item').forEach((btn) => {
+        const on = btn.dataset.mode === cur;
+        btn.classList.toggle('is-active', on);
+        btn.setAttribute('aria-checked', on ? 'true' : 'false');
+      });
     }
 
     // Keep the bar (or collapsed puck) on-screen when the window is resized.
@@ -398,11 +500,47 @@
           this.puck.style.left = Math.max(8, Math.min(r.left, window.innerWidth - 60)) + 'px';
           this.puck.style.top = Math.max(8, Math.min(r.top, window.innerHeight - 60)) + 'px';
         } else if (this.root) {
+          this._fitToViewport();
           const r = this.root.getBoundingClientRect();
           this._setPosition({ left: r.left, top: r.top });
         }
         this._togglePopover(false);
+        this._toggleInputMenu(false);
       });
+    }
+
+    // Responsive fit: on a narrow window the full-size bar would wrap onto extra
+    // rows (or run off-screen). We progressively compact it so it stays a tidy,
+    // usable single row: first shrink the buttons/gaps, then — if still wrapping —
+    // hide the inline thickness slider (still reachable in the colour popover).
+    // Driven by the ACTUAL rendered width, so it adapts to how many tools are on
+    // the bar, not just a fixed viewport breakpoint. Idempotent: classes are
+    // reset each call, so widening the window restores the chosen size.
+    _fitToViewport() {
+      const r = this.root;
+      if (!r || this.collapsed || r.style.display === 'none') return;
+      r.classList.remove('dp-fit-compact', 'dp-fit-min');
+      if (this._isWrapping()) {
+        r.classList.add('dp-fit-compact');
+        if (this._isWrapping()) r.classList.add('dp-fit-min');
+      }
+    }
+
+    // The bar is a wrapping flex row, so "doesn't fit" shows up as extra height
+    // (a second row) rather than horizontal overflow. Compare the rendered height
+    // to a single button-row's height plus the bar's own padding/border.
+    _isWrapping() {
+      const r = this.root;
+      if (!r) return false;
+      const cs = getComputedStyle(r);
+      const padV = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
+      const borderV = (parseFloat(cs.borderTopWidth) || 0) + (parseFloat(cs.borderBottomWidth) || 0);
+      let rowH = 0;
+      r.querySelectorAll('.dp-btn, .dp-color-btn, .dp-grip').forEach((el) => {
+        if (el.offsetHeight > rowH) rowH = el.offsetHeight;
+      });
+      if (!rowH) rowH = 34;
+      return r.offsetHeight > rowH + padV + borderV + 6;
     }
 
     // ---- state sync ------------------------------------------------------
@@ -434,11 +572,27 @@
       this._undoBtn.disabled = !s.canUndo;
       this._redoBtn.disabled = !s.canRedo;
       this._clearBtn.disabled = !s.canClear;
+      this._refreshInputBtn();
+    }
+
+    // The switcher icon mirrors the active (effective) device; the tooltip notes
+    // when that came from auto-detection.
+    _refreshInputBtn() {
+      if (!this._inputBtn || !this.api.getInputMode) return;
+      const eff = this.api.getInputMode();
+      const setting = this.api.getInputModeSetting ? this.api.getInputModeSetting() : eff;
+      const meta = INPUT_META[eff] || INPUT_META.mouse;
+      this._inputBtn.innerHTML = svg(meta.icon);
+      const auto = setting === 'auto' ? ' (auto)' : '';
+      const label = `Input: ${meta.label}${auto} — click to change`;
+      this._inputBtn.title = label;
+      this._inputBtn.setAttribute('aria-label', label);
+      if (this.inputMenu && this.inputMenu.style.display !== 'none') this._refreshInputMenu();
     }
 
     // ---- theme / accent --------------------------------------------------
     _applyTheme(theme) {
-      for (const el of [this.root, this.puck, this.popover]) {
+      for (const el of [this.root, this.puck, this.popover, this.inputMenu]) {
         if (!el) continue;
         el.classList.remove('dp-theme-light', 'dp-theme-dark');
         if (theme === 'light') el.classList.add('dp-theme-light');
@@ -447,7 +601,7 @@
     }
     _applyAccent(hex) {
       if (!hex) return;
-      for (const el of [this.root, this.puck, this.popover]) el && el.style.setProperty('--dp-accent', hex);
+      for (const el of [this.root, this.puck, this.popover, this.inputMenu]) el && el.style.setProperty('--dp-accent', hex);
     }
 
     // Size / shape / custom colour — all driven through CSS variables so the bar
@@ -523,6 +677,7 @@
           this.puck.classList.remove('dp-hide');
         }, 190);
         this.root.style.display = 'flex';
+        this._fitToViewport();
         this._setPosition({ left: Math.min(r.left, window.innerWidth - 120), top: r.top });
         this.root.classList.add('dp-hide');
         requestAnimationFrame(() => this.root.classList.remove('dp-hide'));

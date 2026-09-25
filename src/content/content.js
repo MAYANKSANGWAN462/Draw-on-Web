@@ -24,6 +24,20 @@
     n: 'ns-resize', s: 'ns-resize', e: 'ew-resize', w: 'ew-resize'
   };
 
+  // Input-device glyphs, shared by the first-run picker and the toolbar switcher.
+  const INPUT_ICONS = {
+    auto: '<path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/>',
+    mouse: '<rect x="5" y="2" width="14" height="20" rx="7"/><path d="M12 6v4"/>',
+    trackpad: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 14h18"/><path d="M11 17.5h2"/>',
+    touch: '<path d="M18 11.5V9a2 2 0 0 0-4 0"/><path d="M14 10V8a2 2 0 0 0-4 0v1"/><path d="M10 9V5a2 2 0 0 0-4 0v9"/><path d="M18 11a2 2 0 1 1 4 0v3a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>'
+  };
+  const INPUT_LABELS = { auto: 'Auto-detect', mouse: 'Mouse', trackpad: 'Trackpad', touch: 'Touchscreen' };
+  function inputSvg(name, size = 24) {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" ' +
+      `stroke-linecap="round" stroke-linejoin="round" width="${size}" height="${size}" aria-hidden="true">` +
+      (INPUT_ICONS[name] || '') + '</svg>';
+  }
+
   const DrawingPen = {
     active: false,
     interactive: true,
@@ -35,6 +49,13 @@
     _pointerId: null,
     _mode: null,
     _shiftDown: false,
+    // Input device handling (mouse / trackpad / touch). `_inputMode` is the
+    // resolved effective mode; `_pointers` tracks live touch points so a second
+    // finger switches from drawing to a two-finger pan gesture.
+    _inputMode: 'mouse',
+    _pointers: new Map(),
+    _pan: null,
+    _penDown: false,
     _textEl: null,
     _textEdit: null,
     _saveTimer: null,
@@ -63,6 +84,7 @@
       this.interactive = true;
 
       this.settings = await Storage.getSettings();
+      this._inputMode = this._resolveInputMode(this.settings.inputMode);
 
       this.engine = new DrawingEngine();
       this.engine.tool = this.settings.defaultTool || 'pen';
@@ -107,6 +129,7 @@
 
       this._attachPointerHandlers();
       this._buildCursor();
+      this._applyInputMode();
 
       this.toolbar = new Toolbar(this._buildApi());
       await this.toolbar.mount();
@@ -119,16 +142,27 @@
       this._unsubSettings = Storage.onSettingsChanged((s) => {
         this.settings = s;
         if (this.engine) this.engine.smoothing = s.smoothing ?? 0.5;
+        this._inputMode = this._resolveInputMode(s.inputMode);
+        this._applyInputMode();
         this.toolbar && this.toolbar.applySettings(s);
       });
 
       if (this.settings.autoRestore) await this._restoreForUrl();
 
-      // First time the pen is switched on: show the interactive welcome once.
-      // Keyed on 'welcomeSeen' (not the old 'guideSeen') so the redesigned tour
-      // also greets users who had already dismissed the previous static guide.
+      // First-run onboarding: ask which input device they use (so drawing feels
+      // right on a mouse, trackpad, or touchscreen), THEN show the interactive
+      // welcome tour. Each is shown at most once; the picker chains into the tour.
+      const inputAsked = await Storage.getLocal('inputModeAsked', false);
       const welcomeSeen = await Storage.getLocal('welcomeSeen', false);
-      if (!welcomeSeen) { Storage.setLocal('welcomeSeen', true); this._showGuide(); }
+      const showWelcome = () => {
+        if (!welcomeSeen) { Storage.setLocal('welcomeSeen', true); this._showGuide(); }
+      };
+      if (!inputAsked) {
+        Storage.setLocal('inputModeAsked', true);
+        this._showInputPicker(showWelcome);
+      } else {
+        showWelcome();
+      }
 
       console.log('%cDraw on Web active', 'color:#f97316;font-weight:bold');
     },
@@ -144,7 +178,13 @@
       this._detachPointerHandlers();
       if (this._unsubSettings) { this._unsubSettings(); this._unsubSettings = null; }
 
+      this._pointers.clear();
+      this._pan = null;
+      this._penDown = false;
+
       if (this._modal) { this._modal.remove(); this._modal = null; }
+      if (this._inputPicker) { this._inputPicker.remove(); this._inputPicker = null; }
+      if (this._inputMenu) { this._inputMenu.remove(); this._inputMenu = null; }
       if (this._guide) { this._guide.remove(); this._guide = null; }
       if (this.cursor) { this.cursor.remove(); this.cursor = null; }
       if (this.toolbar) { this.toolbar.destroy(); this.toolbar = null; }
@@ -170,6 +210,12 @@
         setWidth(n) { self.engine.width = n; self._styleCursor(); self._refresh(); },
         setOpacity(n) { self.engine.opacity = n; self._styleCursor(); self._refresh(); },
         setInteractive(on) { self.setInteractive(on); },
+        // Resolved effective mode (mouse/trackpad/touch) vs the raw stored setting
+        // (which may be 'auto'). The toolbar shows the effective icon but ticks the
+        // stored choice in its menu.
+        getInputMode() { return self._inputMode; },
+        getInputModeSetting() { return (self.settings && self.settings.inputMode) || 'auto'; },
+        setInputMode(mode) { self.setInputMode(mode); },
         undo() { self._clearSelection(); self.engine.undo(); },
         redo() { self._clearSelection(); self.engine.redo(); },
         clear() {
@@ -219,6 +265,52 @@
       if (!this.interactive) this._showCursor(false);
     },
 
+    // ---- input device (mouse / trackpad / touch) -------------------------
+    // Turn the stored setting into a concrete mode. 'auto' resolves to 'touch'
+    // on coarse, no-hover devices (phones/tablets) and 'mouse' otherwise —
+    // trackpad can't be told apart from a mouse automatically (both surface as
+    // "mouse" pointers), which is exactly why we offer the explicit picker.
+    _resolveInputMode(setting) {
+      if (setting === 'mouse' || setting === 'trackpad' || setting === 'touch') return setting;
+      try {
+        const coarse = matchMedia('(pointer: coarse)').matches;
+        const noHover = matchMedia('(hover: none)').matches;
+        if (coarse && noHover) return 'touch';
+      } catch (_e) { /* matchMedia unavailable — fall through */ }
+      return 'mouse';
+    },
+
+    // Persist an explicit choice; the settings-changed listener re-resolves and
+    // re-applies. Called from the first-run picker and the toolbar switcher.
+    setInputMode(mode) {
+      this._inputMode = this._resolveInputMode(mode);
+      // Reflect the choice locally right away so the toolbar updates without
+      // waiting for the async storage round-trip; setSettings then persists it.
+      if (this.settings) this.settings.inputMode = mode;
+      this._applyInputMode();
+      Storage.setSettings({ inputMode: mode });
+      this._refresh();
+    },
+
+    // Reflect the current mode on the DOM (a data attribute for CSS hooks) and
+    // hide the brush-preview dot on touch, where a fingertip covers it anyway.
+    _applyInputMode() {
+      try { document.documentElement.setAttribute('data-dp-input', this._inputMode); } catch (_e) {}
+      if (this._inputMode === 'touch') this._showCursor(false);
+    },
+
+    // Pointer hit-slop multiplier: coarse pointers (trackpad taps, fingertips)
+    // need a more forgiving grab radius for selection handles and text than a
+    // pixel-precise mouse. Keeps the same tools usable across devices.
+    _hitTol() {
+      return this._inputMode === 'touch' ? 2.4 : this._inputMode === 'trackpad' ? 1.6 : 1;
+    },
+    // Extra px added to stroke/text hit-testing, so tapping a thin line or a
+    // small text block actually grabs it on a trackpad or touchscreen.
+    _hitExtra() {
+      return this._inputMode === 'touch' ? 12 : this._inputMode === 'trackpad' ? 6 : 0;
+    },
+
     _refresh() { this.toolbar && this.toolbar.refresh(); },
 
     // Committed scene changed -> repaint static layer, refresh UI, autosave.
@@ -244,7 +336,20 @@
     _attachPointerHandlers() {
       const el = this.canvas.base;
       this._onDown = (e) => {
-        if (!this.interactive || e.button !== 0) return;
+        if (!this.interactive) return;
+        if (e.pointerType === 'pen') {
+          this._penDown = true;                 // a stylus is in contact
+        } else if (e.pointerType === 'touch') {
+          // Palm rejection: while a stylus draws, ignore stray touches (a resting
+          // hand on a pen display) so they can't scribble or pan.
+          if (this._penDown) { e.preventDefault(); return; }
+          this._pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+          // A second finger turns the gesture into a two-finger pan: abandon any
+          // stroke the first finger just began, so scrolling never leaves a mark.
+          if (this._pointers.size >= 2) { this._beginPan(); e.preventDefault(); return; }
+        } else if (e.button !== 0) {
+          return; // ignore right / middle mouse buttons
+        }
         const tool = this.engine.tool;
         // Anchor this stroke to whatever actually scrolls the content under the
         // pointer (an inner container, or the page root) so it tracks that
@@ -293,6 +398,12 @@
       };
 
       this._onMove = (e) => {
+        if (e.pointerType === 'touch' && this._pointers.has(e.pointerId)) {
+          this._pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        }
+        // Two-finger pan in progress: scroll instead of drawing / hovering.
+        if (this._pan) { this._updatePan(); e.preventDefault(); return; }
+
         this._moveCursor(e.clientX, e.clientY);
 
         // Select tool: hover cursor feedback when not dragging.
@@ -320,6 +431,11 @@
       };
 
       this._onUp = (e) => {
+        if (e.pointerType === 'pen') this._penDown = false;
+        if (e.pointerType === 'touch') this._pointers.delete(e.pointerId);
+        // A pan ends once fewer than two fingers remain on the surface. The last
+        // finger left over does nothing until it too lifts (no new pointerdown).
+        if (this._pan) { if (this._pointers.size < 2) this._endPan(); return; }
         if (this._pointerId !== e.pointerId) return;
         this._pointerId = null;
         if (this._selGesture) this._selectUp();
@@ -344,6 +460,11 @@
 
       this._onWheel = (e) => {
         if (!this.interactive) return;
+
+        // Pinch-to-zoom on a trackpad (and Ctrl/⌘ + wheel) arrives as a wheel
+        // event with ctrlKey set. Let the browser zoom the page natively rather
+        // than hijacking it to scroll — essential for trackpad users who pinch.
+        if (e.ctrlKey) return;
 
         // Alt + wheel = quick brush-size change without leaving the canvas.
         if (e.altKey) {
@@ -443,6 +564,47 @@
       return de.scrollHeight - de.clientHeight > 2 || de.scrollWidth - de.clientWidth > 2;
     },
 
+    // ---- two-finger pan (touchscreens) -----------------------------------
+    // On touch, one finger draws and two fingers scroll — mirroring how the page
+    // behaves normally, so touch users can navigate without leaving draw mode.
+    _centroid() {
+      let x = 0, y = 0, n = 0;
+      this._pointers.forEach((p) => { x += p.x; y += p.y; n++; });
+      return n ? { x: x / n, y: y / n } : { x: 0, y: 0 };
+    },
+    _beginPan() {
+      // Roll back whatever the first finger started so a pan never draws.
+      if (this._mode === 'freehand' || this._mode === 'shape') {
+        this.engine.cancelActive();
+        this.canvas.requestLivePaint();
+      } else if (this._mode === 'eraser') {
+        this.engine.eraseEnd();
+      } else if (this._selGesture) {
+        this._selGesture = null; this._selPreview = null; this._selPreviewBBox = null;
+        this._selOriginals = null; this._selAnchor = null; this._marquee = null;
+        this._selMoved = false;
+        if (this._hiddenSet) this._hiddenSet.clear();
+        this.canvas.paintBase();
+        this.canvas.requestLivePaint();
+      }
+      this._mode = null;
+      this._pointerId = null;
+      this._showCursor(false);
+      const c = this._centroid();
+      // Anchor to (and scroll) whatever container is under the fingers.
+      this.canvas.setScroller(this._findScrollerAt(c.x, c.y));
+      this._pan = { x: c.x, y: c.y };
+    },
+    _updatePan() {
+      const c = this._centroid();
+      const dx = this._pan.x - c.x, dy = this._pan.y - c.y;
+      this._pan = { x: c.x, y: c.y };
+      const s = this.canvas.scroller;
+      if (s && s.isConnected) s.scrollBy(dx, dy);
+      else window.scrollBy(dx, dy);
+    },
+    _endPan() { this._pan = null; },
+
     // ---- select tool (marquee / move / resize) ---------------------------
     _selectDown(dp) {
       this._selMoved = false;
@@ -452,7 +614,7 @@
         if (h) { this._beginResize(h, box, dp); return; }
         if (this._insideBBox(dp)) { this._beginMove(dp); return; }
       }
-      const idx = this.engine.hitTest(dp);
+      const idx = this.engine.hitTest(dp, this._hitExtra());
       if (idx >= 0) {
         this.selection.indices = [idx];
         this.selection.bbox = this.engine.bboxOfIndices([idx]);
@@ -590,7 +752,7 @@
     _handleAt(dp) {
       const box = this.selection.bbox;
       if (!box) return null;
-      const tol = 7;
+      const tol = 7 * this._hitTol();
       for (const h of this._handlePoints(box)) {
         if (Math.abs(dp.x - h.x) <= tol && Math.abs(dp.y - h.y) <= tol) return h.id;
       }
@@ -624,12 +786,12 @@
         if (h) { this._commitText(false); this._beginResize(h, box, dp); return true; }
         if (this._insideBBox(dp)) { this._commitText(false); this._beginMove(dp); return true; }
       }
-      const idx = this.engine.hitTestText(dp);
+      const idx = this.engine.hitTestText(dp, this._hitExtra());
       if (idx >= 0) {
         this._commitText(false);
         // Committing typed text can shift indices/scene; re-resolve the hit so we
         // grab the text actually under the pointer.
-        const grab = this.engine.hitTestText(dp);
+        const grab = this.engine.hitTestText(dp, this._hitExtra());
         if (grab < 0) return false;
         this.selection.indices = [grab];
         this.selection.bbox = this.engine.bboxOfIndices([grab]);
@@ -643,11 +805,12 @@
     // otherwise an I-beam to signal "click to place text here".
     _updateTextHoverCursor(dp) {
       let cur = 'text';
+      const extra = this._hitExtra();
       if (this.selection.bbox) {
         const h = this._handleAt(dp);
         if (h) cur = HANDLE_CURSORS[h];
-        else if (this._insideBBox(dp) || this.engine.hitTestText(dp) >= 0) cur = 'move';
-      } else if (this.engine.hitTestText(dp) >= 0) {
+        else if (this._insideBBox(dp) || this.engine.hitTestText(dp, extra) >= 0) cur = 'move';
+      } else if (this.engine.hitTestText(dp, extra) >= 0) {
         cur = 'move';
       }
       if (this.canvas) this.canvas.base.style.cursor = cur;
@@ -827,7 +990,7 @@
     // Double-click a text stroke (Select or Text tool) to re-edit its contents.
     _editText(dp) {
       if (this._textEl) return false;
-      const idx = this.engine.hitTestText(dp);
+      const idx = this.engine.hitTestText(dp, this._hitExtra());
       if (idx < 0) return false;
       const orig = this.engine.strokes[idx];
       this._clearSelection();
@@ -893,6 +1056,8 @@
     },
     _moveCursor(x, y) {
       if (!this.cursor || !this.interactive) return;
+      // On a touchscreen the fingertip covers the dot, so there's nothing to show.
+      if (this._inputMode === 'touch') { this._showCursor(false); return; }
       // Select and Text tools use native cursors (move/resize/I-beam), not the
       // paint dot, so hide the brush preview for both.
       if (this.engine.tool === 'select' || this.engine.tool === 'text') { this._showCursor(false); return; }
@@ -1015,6 +1180,58 @@
       setTimeout(() => overlay.querySelector('.dp-confirm').focus(), 0);
     },
 
+    // ---- first-run input-device picker -----------------------------------
+    // Shown once, the very first time the pen is switched on, so we can tune
+    // gestures + hit tolerances to how the person actually points. Pre-highlights
+    // the auto-detected device; choosing is optional (Skip keeps auto-detect).
+    // `done` is called after the picker closes, to chain into the welcome tour.
+    _showInputPicker(done) {
+      if (this._inputPicker) this._inputPicker.remove();
+      const detected = this._resolveInputMode('auto');
+      const OPTS = [
+        { id: 'mouse', desc: 'A regular mouse — click and drag to draw.' },
+        { id: 'trackpad', desc: 'A laptop touchpad — press and glide to draw; two-finger scroll and pinch-to-zoom keep working.' },
+        { id: 'touch', desc: 'A touchscreen — one finger draws, two fingers scroll the page.' }
+      ];
+
+      const overlay = document.createElement('div');
+      overlay.className = 'dp-modal-overlay dp-input-overlay';
+      const theme = this.settings && this.settings.theme;
+      if (theme === 'light') overlay.classList.add('dp-theme-light');
+      else if (theme === 'dark') overlay.classList.add('dp-theme-dark');
+      if (this.settings) overlay.style.setProperty('--dp-accent', this.settings.accentColor);
+
+      overlay.innerHTML =
+        '<div class="dp-input-picker" role="dialog" aria-modal="true" aria-label="Choose your input device">' +
+          '<div class="dp-ip-title">How do you draw?</div>' +
+          '<div class="dp-ip-sub">Pick your device so drawing feels right everywhere. You can change it anytime from the toolbar or Settings.</div>' +
+          '<div class="dp-ip-grid">' +
+          OPTS.map((o) =>
+            `<button type="button" class="dp-ip-card${o.id === detected ? ' is-suggested' : ''}" data-mode="${o.id}">` +
+              `<span class="dp-ip-ico">${inputSvg(o.id, 30)}</span>` +
+              `<span class="dp-ip-name">${INPUT_LABELS[o.id]}${o.id === detected ? '<em>Detected</em>' : ''}</span>` +
+              `<span class="dp-ip-desc">${o.desc}</span>` +
+            '</button>').join('') +
+          '</div>' +
+          '<button type="button" class="dp-ip-skip">Not sure — decide for me</button>' +
+        '</div>';
+
+      const close = (mode) => {
+        overlay.remove();
+        if (this._inputPicker === overlay) this._inputPicker = null;
+        if (mode) this.setInputMode(mode);
+        if (done) done();
+      };
+      overlay.querySelectorAll('.dp-ip-card').forEach((btn) =>
+        btn.addEventListener('click', () => close(btn.dataset.mode)));
+      overlay.querySelector('.dp-ip-skip').addEventListener('click', () => close(null));
+      overlay.addEventListener('pointerdown', (e) => { if (e.target === overlay) close(null); });
+
+      document.documentElement.appendChild(overlay);
+      this._inputPicker = overlay;
+      setTimeout(() => { const c = overlay.querySelector('.dp-ip-card.is-suggested') || overlay.querySelector('.dp-ip-card'); c && c.focus(); }, 0);
+    },
+
     // ---- interactive welcome / guide (onboarding + reopenable) -----------
     // A short, animated carousel that shows what makes Draw on Web different,
     // rather than a wall of text. Each slide has its own little visual so the
@@ -1117,6 +1334,7 @@
     // so the flow above stays generic. Visuals are tiny inline SVG/CSS scenes —
     // no assets, no network — themed by the same accent as the rest of the UI.
     _guideSlides() {
+      const MOD = Storage.MOD_LABEL;   // "⌘" on macOS, "Ctrl" elsewhere
       const penLogo =
         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="34" height="34"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>';
       const toolIco = (p) =>
@@ -1193,12 +1411,12 @@
         {
           tag: 'You’re ready',
           title: 'Start annotating',
-          desc: 'Toggle anytime with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd>. Switch tools with single keys — <kbd>P</kbd>en, <kbd>H</kbd>ighlighter, <kbd>T</kbd>ext, <kbd>E</kbd>raser. Undo with <kbd>Ctrl</kbd>+<kbd>Z</kbd>, and press <kbd>C</kbd> to use the site normally while your marks stay put.',
+          desc: `Toggle anytime with <kbd>${MOD}</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd>. Switch tools with single keys — <kbd>P</kbd>en, <kbd>H</kbd>ighlighter, <kbd>T</kbd>ext, <kbd>E</kbd>raser. Undo with <kbd>${MOD}</kbd>+<kbd>Z</kbd>, and press <kbd>C</kbd> to use the site normally while your marks stay put.`,
           visual:
             '<div class="dp-g-ready">' +
               `<div class="dp-g-ready-logo">${penLogo}</div>` +
               '<div class="dp-g-ready-keys">' +
-                '<kbd>Ctrl</kbd><kbd>Shift</kbd><kbd>D</kbd>' +
+                `<kbd>${MOD}</kbd><kbd>Shift</kbd><kbd>D</kbd>` +
               '</div>' +
             '</div>'
         }
@@ -1332,7 +1550,7 @@
     tip.innerHTML =
       '<div class="dp-firstrun-arrow"></div>' +
       '<strong>Draw on Web</strong> is ready — click the pinned icon ' +
-      'or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd> to start drawing.' +
+      `or press <kbd>${Storage.MOD_LABEL}</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd> to start drawing.` +
       '<button class="dp-firstrun-x" aria-label="Dismiss">&times;</button>';
     const close = () => tip.remove();
     tip.querySelector('.dp-firstrun-x').addEventListener('click', close);

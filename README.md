@@ -16,6 +16,7 @@ Built with **vanilla JavaScript, HTML, and CSS**. No framework, no bundler, no d
 - **Multi-line text that wraps** to the window, honours your own line breaks, and offers five font families.
 - **A polished, customisable toolbar** — draggable, collapsible to a puck, with configurable size, corner shape, colour, and which tools appear (and in what order).
 - **Two export modes** — a viewport screenshot, or a full-page vector render that captures every stroke across the whole document.
+- **Works on mouse, trackpad, and touch** — picks the right gestures and touch-target sizes for your device (asked once on first run, changeable anytime), with pinch-to-zoom and two-finger scroll respected. Shortcuts show **⌘/⌥/⇧** on macOS and **Ctrl/Alt/Shift** elsewhere.
 - **Settings that sync** across your Chrome installs via `chrome.storage.sync`.
 
 ## Engineering highlights
@@ -47,6 +48,8 @@ There is no build command — it loads directly as-is.
 
 A slim, glassy toolbar appears. Drag it by the left grip, or collapse it to a puck with the chevron — it remembers where you left it. A **thickness slider sits right on the bar** (the control you reach for most); colour and opacity live in a compact popover behind the colour dot. The first time you switch it on, a **quick guide** introduces the tools — reopen it anytime from the **?** button.
 
+The bar is **responsive**: resize the Chrome window narrow and it automatically compacts (smaller buttons, then it tucks away the inline slider) so it stays a tidy single row instead of wrapping or running off-screen — and it restores your chosen size when the window grows again.
+
 Works on `http(s)` pages, and on local `file://` pages once you enable *Allow access to file URLs* (`chrome://extensions` → Draw on Web → Details).
 
 ## Tools
@@ -74,14 +77,24 @@ Each tool remembers its own **thickness and opacity** (so the highlighter's tran
 - **Pen mode** — you draw on the page; scrolling still works and drawings scroll with the content.
 - **Cursor mode** — the drawing layer ignores clicks so you can use the site normally; your annotations remain visible and anchored.
 
+## Mouse, trackpad, and touch
+
+Draw on Web works on Windows, macOS, ChromeOS, Linux, and touch devices — anywhere Chrome runs extensions. The **first time you switch it on it asks how you draw**, and you can change it anytime from the **input-device button on the toolbar** or **Settings → Behaviour → Input device**.
+
+- **Mouse** — click and drag to draw; **wheel** scrolls the page (or an inner scroller under the pointer).
+- **Trackpad** — press and glide to draw; **two-finger scroll** moves the page, and **pinch-to-zoom** passes straight through to the browser instead of being hijacked. Selection handles and text get a more forgiving grab radius.
+- **Touchscreen** — **one finger draws**, **two fingers scroll/pan** the page (or the container under them), and touch targets are enlarged. The brush preview dot is hidden since your fingertip covers it.
+
+Keyboard shortcuts and tooltips adapt to your platform too — they show **⌘ / ⌥ / ⇧** on macOS and **Ctrl / Alt / Shift** elsewhere.
+
 ## Settings
 
 Open via the gear on the toolbar, or right-click the icon → **Options**.
 
 - **Tools** — show/hide individual tools and **drag to reorder** them on the bar
 - **Toolbar style** — size (Compact / Regular / Large), corner shape (Sharp / Rounded / Pill, which also reshapes the buttons), a custom toolbar colour with automatic text-contrast, a live preview, and a toggle for the on-bar thickness slider
-- **Defaults** — starting tool, colour, thickness, opacity, toolbar position, and **text font** (Sans-serif, Serif, Monospace, Rounded, Handwritten)
-- **Behaviour** — pen smoothing (Off / Low / Medium / High), export mode, and **auto-restore drawings when revisiting a page** (off by default; saved per URL on this device)
+- **Defaults** — starting tool, colour, thickness, opacity, toolbar position, and **text font** (Monospace by default; also Sans-serif, Serif, Rounded, Handwritten)
+- **Behaviour** — **input device** (Auto-detect / Mouse / Trackpad / Touchscreen), pen smoothing (Off / Low / Medium / High), export mode, and **auto-restore drawings when revisiting a page** (off by default; saved per URL on this device)
 - **Appearance** — theme (Auto / Light / Dark) and accent colour
 - A **keyboard-shortcuts reference**, **Clear saved drawings**, and **Reset to defaults**
 

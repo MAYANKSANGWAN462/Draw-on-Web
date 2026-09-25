@@ -180,6 +180,18 @@
         <p class="hint">How strokes are drawn, exported, and kept.</p>
       </div>
       <div class="row">
+        <div>
+          <label for="inputMode">Input device</label>
+          <p class="hint">Tunes gestures and how big the touch targets are. <b>Mouse</b>: click &amp; drag. <b>Trackpad</b>: press &amp; glide — two-finger scroll and pinch-to-zoom keep working. <b>Touchscreen</b>: one finger draws, two fingers scroll. <b>Auto-detect</b> picks for you.</p>
+        </div>
+        <select id="inputMode">
+          <option value="auto">Auto-detect</option>
+          <option value="mouse">Mouse</option>
+          <option value="trackpad">Trackpad</option>
+          <option value="touch">Touchscreen</option>
+        </select>
+      </div>
+      <div class="row">
         <label>Pen smoothing</label>
         <div class="segmented" id="smoothing" role="radiogroup" aria-label="Pen smoothing">
           <button type="button" data-sm="0" role="radio">Off</button>
