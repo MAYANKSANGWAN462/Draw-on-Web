@@ -171,6 +171,8 @@
       if (!this.active) return;
       this.active = false;
       this._commitText(true);
+      clearTimeout(this._restyleTimer);
+      if (this.engine) this.engine.flushRestyle();
 
       document.removeEventListener('keydown', this._onKeyDown, true);
       document.removeEventListener('keyup', this._onKeyUp, true);
@@ -206,9 +208,12 @@
           };
         },
         selectTool(id) { self.selectTool(id); },
-        setColor(hex) { self.engine.color = hex; self._styleCursor(); self._refresh(); },
-        setWidth(n) { self.engine.width = n; self._styleCursor(); self._refresh(); },
-        setOpacity(n) { self.engine.opacity = n; self._styleCursor(); self._refresh(); },
+        // Changing colour / thickness / opacity sets the default for the NEXT
+        // stroke and — when strokes are selected — restyles those too, so the
+        // guide's promise ("restyle anything you've drawn") actually holds.
+        setColor(hex) { self.engine.color = hex; self._restyleSelection((s) => { s.color = hex; }); self._styleCursor(); self._refresh(); },
+        setWidth(n) { self.engine.width = n; self._restyleSelection((s) => self._applyWidthTo(s, n)); self._styleCursor(); self._refresh(); },
+        setOpacity(n) { self.engine.opacity = n; self._restyleSelection((s) => { s.opacity = n; }); self._styleCursor(); self._refresh(); },
         setInteractive(on) { self.setInteractive(on); },
         // Resolved effective mode (mouse/trackpad/touch) vs the raw stored setting
         // (which may be 'auto'). The toolbar shows the effective icon but ticks the
@@ -230,7 +235,13 @@
     },
 
     selectTool(id) {
-      this._commitText(true);
+      // Don't switch tools in the middle of a drag (drawing a shape, or moving /
+      // resizing a selection): a hotkey pressed mid-gesture would otherwise leave
+      // it half-finished with the pointer still captured. Let the gesture finish.
+      if (this._mode || this._selGesture) return;
+      // Save (not discard) any text still being typed — switching tools should
+      // keep your words, exactly like clicking elsewhere on the page does.
+      this._commitText(false);
       if (id !== 'select') this._clearSelection();
       // Save the outgoing tool's size/opacity, then load the incoming tool's.
       const prev = this.engine.tool;
@@ -255,7 +266,9 @@
 
     setInteractive(on) {
       this.interactive = on;
-      if (!on) { this._commitText(true); this._clearSelection(); }
+      // Switching to "use the site" keeps any text you were typing (commit, don't
+      // discard) — losing it on a mode toggle is never what you meant.
+      if (!on) { this._commitText(false); this._clearSelection(); }
       this._applyMode();
       this._refresh();
     },
@@ -312,6 +325,29 @@
     },
 
     _refresh() { this.toolbar && this.toolbar.refresh(); },
+
+    // Apply a style change (colour / thickness / opacity) to the current
+    // selection. No-op when nothing is selected — then the setter has only
+    // updated the default for the next stroke. A rapid burst (e.g. dragging a
+    // slider) is coalesced by the engine into ONE undo step, closed by the
+    // debounce below (or by any other edit, which flushes it first).
+    _restyleSelection(mutate) {
+      const idxs = this.selection && this.selection.indices;
+      if (!idxs || !idxs.length || !this.engine) return;
+      this.engine.restyleSelection(idxs, mutate);
+      this.selection.bbox = this.engine.bboxOfIndices(idxs);
+      clearTimeout(this._restyleTimer);
+      this._restyleTimer = setTimeout(() => { if (this.engine) this.engine.flushRestyle(); }, 350);
+      if (this.canvas) this.canvas.requestLivePaint(); // redraw the selection box at the new bbox
+    },
+    // Map the thickness value onto a stroke: line/shape width for most strokes,
+    // font size for text and the disc size for number stamps (same formulas used
+    // when they're first created, so restyle matches fresh drawing).
+    _applyWidthTo(s, n) {
+      if (s.type === 'text') s.size = Math.max(12, n * 4 + 8);
+      else if (s.type === 'counter') s.size = Math.max(22, n * 3 + 14);
+      else if (s.width != null) s.width = n;
+    },
 
     // Committed scene changed -> repaint static layer, refresh UI, autosave.
     // Adding a single stroke paints just that stroke onto the static layer

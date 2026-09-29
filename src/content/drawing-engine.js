@@ -114,6 +114,7 @@
       this.active = null;          // in-progress freehand/shape stroke
       this._eraseSnapshot = null;  // snapshot taken at the start of an erase drag
       this._erasedAny = false;
+      this._restyleSnap = null;    // snapshot open while a selection is being restyled
       this._counter = 0;           // running number for the step-marker stamp
       this._smx = 0; this._smy = 0; // smoothing anchor for the active freehand
       // Classifies the last scene change so the canvas can repaint cheaply:
@@ -147,6 +148,7 @@
     // trims an old stroke off the front, which shifts indices and needs a full
     // repaint to drop the evicted ink.
     _commit(snapshot) {
+      this.flushRestyle();       // close any open restyle step first, so undo order stays correct
       this.undoStack.push(snapshot);
       this.redoStack.length = 0;
       let trimmed = false;
@@ -287,7 +289,7 @@
     resetCounter() { this._counter = 0; }
 
     // ---- eraser (stroke-level) -------------------------------------------
-    eraseBegin() { this._eraseSnapshot = this._snapshot(); this._erasedAny = false; }
+    eraseBegin() { this.flushRestyle(); this._eraseSnapshot = this._snapshot(); this._erasedAny = false; }
     eraseAt(p) {
       const idx = this._hitTest(p, this.eraseRadius || 0);
       if (idx === -1) return false;
@@ -364,6 +366,7 @@
 
     // ---- history ---------------------------------------------------------
     undo() {
+      this.flushRestyle();
       if (!this.undoStack.length) return false;
       this.redoStack.push(this.strokes.slice());
       this.strokes = this.undoStack.pop();
@@ -371,6 +374,7 @@
       return true;
     }
     redo() {
+      this.flushRestyle();
       if (!this.redoStack.length) return false;
       this.undoStack.push(this.strokes.slice());
       this.strokes = this.redoStack.pop();
@@ -378,6 +382,7 @@
       return true;
     }
     clear() {
+      this.flushRestyle();
       if (this.isEmpty()) return false;
       const snap = this._snapshot();
       this.strokes = [];
@@ -395,6 +400,7 @@
     // ---- persistence -----------------------------------------------------
     toJSON() { return this.strokes; }
     loadJSON(strokes) {
+      this._restyleSnap = null;   // any open restyle step is moot — the scene is being replaced
       this.strokes = Array.isArray(strokes) ? strokes.slice() : [];
       this.undoStack = [];
       this.redoStack = [];
@@ -475,8 +481,34 @@
       return s;
     }
 
+    // Restyle the given strokes in place (colour / thickness / opacity), cloning
+    // each so committed strokes are never mutated (keeps history snapshots valid).
+    // A burst of restyles — e.g. dragging the thickness slider over a selection —
+    // is coalesced into ONE undoable step: the pre-restyle snapshot is taken on
+    // the first call and only pushed to the undo stack by flushRestyle(), which
+    // any other mutator (and the controller's debounce) calls to close the step.
+    restyleSelection(indices, mutate) {
+      if (!indices || !indices.length) return;
+      if (!this._restyleSnap) this._restyleSnap = this._snapshot();
+      for (const idx of indices) {
+        const s = this.strokes[idx];
+        if (!s) continue;
+        const next = this.cloneStroke(s);
+        mutate(next);
+        this.strokes[idx] = next;
+      }
+      this._emit();
+    }
+    flushRestyle() {
+      if (!this._restyleSnap) return;
+      this.undoStack.push(this._restyleSnap);
+      this.redoStack.length = 0;
+      this._restyleSnap = null;
+    }
+
     // Replace strokes at the given indices (one undoable action).
     replaceStrokes(indices, newStrokes) {
+      this.flushRestyle();
       const snap = this._snapshot();
       indices.forEach((idx, i) => { if (this.strokes[idx]) this.strokes[idx] = newStrokes[i]; });
       this.undoStack.push(snap);
@@ -487,6 +519,7 @@
     // Delete strokes at the given indices (one undoable action).
     deleteStrokes(indices) {
       if (!indices || !indices.length) return;
+      this.flushRestyle();
       const snap = this._snapshot();
       const set = new Set(indices);
       this.strokes = this.strokes.filter((_, i) => !set.has(i));

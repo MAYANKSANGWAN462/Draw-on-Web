@@ -582,7 +582,12 @@
       const eff = this.api.getInputMode();
       const setting = this.api.getInputModeSetting ? this.api.getInputModeSetting() : eff;
       const meta = INPUT_META[eff] || INPUT_META.mouse;
-      this._inputBtn.innerHTML = svg(meta.icon);
+      // refresh() runs on every scene change; only rewrite the SVG when the icon
+      // actually changes, so the button never flickers/reflows mid-draw.
+      if (this._inputIcon !== meta.icon) {
+        this._inputBtn.innerHTML = svg(meta.icon);
+        this._inputIcon = meta.icon;
+      }
       const auto = setting === 'auto' ? ' (auto)' : '';
       const label = `Input: ${meta.label}${auto} — click to change`;
       this._inputBtn.title = label;

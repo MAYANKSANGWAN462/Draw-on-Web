@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Draw on Web",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "Draw, highlight and annotate on any web page. Your annotations scroll with the page content.",
   "permissions": ["activeTab", "storage", "scripting"],
   "host_permissions": ["<all_urls>", "file:///*"],
