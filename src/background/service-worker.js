@@ -57,6 +57,14 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     chrome.runtime.openOptionsPage();
     return false;
   }
+  // Open the extension's own Chrome Web Store reviews tab. The ID is read at
+  // runtime (chrome.runtime.id), so the link is always correct for whatever
+  // listing published this build — nothing to hardcode or keep in sync.
+  if (msg && msg.type === 'DP_RATE') {
+    const url = `https://chromewebstore.google.com/detail/${chrome.runtime.id}/reviews`;
+    chrome.tabs.create({ url });
+    return false;
+  }
   if (msg && msg.type === 'DP_CAPTURE') {
     const windowId = sender.tab?.windowId;
     chrome.tabs.captureVisibleTab(windowId, { format: 'png' }, (dataUrl) => {

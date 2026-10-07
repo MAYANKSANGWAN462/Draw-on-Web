@@ -787,6 +787,11 @@
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+.dp-g-rate {
+  margin-top: 14px;
+  font-size: 13px;
+  color: var(--dp-fg-dim);
+}
 
 .dp-guide2-foot {
   display: flex;

@@ -521,6 +521,14 @@ kbd, .shortcuts kbd {
 .btn:hover { border-color: var(--line-strong); }
 .btn:active { transform: scale(0.97); }
 .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+a.btn { text-decoration: none; }
+.btn.primary {
+  color: #fff;
+  border-color: transparent;
+  background: var(--accent);
+  white-space: nowrap;
+}
+.btn.primary:hover { border-color: transparent; filter: brightness(1.05); }
 .btn.danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 32%, transparent); }
 .btn.danger:hover { background: color-mix(in srgb, var(--danger) 12%, transparent); }
 .btn:disabled { opacity: 0.5; cursor: default; }

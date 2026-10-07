@@ -461,5 +461,19 @@ function wireControls() {
   });
 }
 
+// Show the running version and point the rate link at this build's own Web
+// Store reviews page. The extension ID is read at runtime, so the link is
+// always correct for whatever listing published this build.
+function wireAbout() {
+  try {
+    const manifest = chrome.runtime.getManifest();
+    const vTag = $('versionTag');
+    if (vTag && manifest && manifest.version) vTag.textContent = 'v' + manifest.version;
+    const rate = $('rateBtn');
+    if (rate) rate.href = `https://chromewebstore.google.com/detail/${chrome.runtime.id}/reviews`;
+  } catch (_e) { /* ignore — about section is non-essential */ }
+}
+
 wireControls();
+wireAbout();
 load();

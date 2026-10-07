@@ -230,6 +230,7 @@
         exportPng() { self.exportPng(); },
         openSettings() { chrome.runtime.sendMessage({ type: 'DP_OPEN_OPTIONS' }); },
         openGuide() { self._showGuide(); },
+        rate() { try { chrome.runtime.sendMessage({ type: 'DP_RATE' }); } catch (_e) {} },
         exit() { self.deactivate(); }
       };
     },
@@ -1114,17 +1115,27 @@
 
       const hidden = [this.toolbar?.root, this.toolbar?.puck, this.toolbar?.popover, this.cursor, this.canvas?.live].filter(Boolean);
       const prev = hidden.map((el) => el.style.visibility);
+      const restore = () => hidden.forEach((el, i) => (el.style.visibility = prev[i]));
       hidden.forEach((el) => (el.style.visibility = 'hidden'));
       await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
 
-      chrome.runtime.sendMessage({ type: 'DP_CAPTURE' }, (resp) => {
-        hidden.forEach((el, i) => (el.style.visibility = prev[i]));
-        if (!resp || resp.error || !resp.dataUrl) {
-          console.warn('[Draw on Web] Export failed:', resp && resp.error);
-          return;
-        }
-        this._downloadDataUrl(resp.dataUrl);
-      });
+      // Wrap the send: if the extension was reloaded/updated mid-session the call
+      // can throw ("Extension context invalidated"). Without this, the toolbar and
+      // cursor would stay hidden until draw mode is toggled off and on again.
+      try {
+        chrome.runtime.sendMessage({ type: 'DP_CAPTURE' }, (resp) => {
+          restore();
+          const err = chrome.runtime.lastError; // read to clear it from the console
+          if (err || !resp || resp.error || !resp.dataUrl) {
+            console.warn('[Draw on Web] Export failed:', (err && err.message) || (resp && resp.error));
+            return;
+          }
+          this._downloadDataUrl(resp.dataUrl);
+        });
+      } catch (e) {
+        restore();
+        console.warn('[Draw on Web] Export failed:', e && e.message);
+      }
     },
 
     // Full-page export: render EVERY stroke across the whole document (not just
@@ -1333,9 +1344,11 @@
         dots.forEach((d, i) => d.classList.toggle('is-active', i === idx));
         backBtn.style.visibility = idx === 0 ? 'hidden' : 'visible';
         nextBtn.textContent = idx === slides.length - 1 ? 'Start drawing' : 'Next';
-        // Wire any in-slide action buttons (e.g. "Open settings").
+        // Wire any in-slide action buttons (e.g. "Open settings", "Rate").
         const act = card.querySelector('[data-action="settings"]');
         if (act) act.addEventListener('click', () => this._buildApi().openSettings());
+        const rate = card.querySelector('[data-action="rate"]');
+        if (rate) rate.addEventListener('click', () => this._buildApi().rate());
       };
 
       const go = (n) => {
@@ -1458,7 +1471,8 @@
         {
           tag: 'You’re ready',
           title: 'Start annotating',
-          desc: `Toggle anytime with <kbd>${MOD}</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd>. Switch tools with single keys — <kbd>P</kbd>en, <kbd>H</kbd>ighlighter, <kbd>T</kbd>ext, <kbd>E</kbd>raser. Undo with <kbd>${MOD}</kbd>+<kbd>Z</kbd>, and press <kbd>C</kbd> to use the site normally while your marks stay put.`,
+          desc: `Toggle anytime with <kbd>${MOD}</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd>. Switch tools with single keys — <kbd>P</kbd>en, <kbd>H</kbd>ighlighter, <kbd>T</kbd>ext, <kbd>E</kbd>raser. Undo with <kbd>${MOD}</kbd>+<kbd>Z</kbd>, and press <kbd>C</kbd> to use the site normally while your marks stay put.` +
+            `<div class="dp-g-rate">Enjoying Draw on Web? <button type="button" class="dp-g-link" data-action="rate">★ Rate it on the Web Store</button></div>`,
           visual:
             '<div class="dp-g-ready">' +
               `<div class="dp-g-ready-logo">${penLogo}</div>` +
