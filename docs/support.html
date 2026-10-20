@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Support — Draw on Web</title>
+  <meta name="description" content="Help, setup guide, keyboard shortcuts, troubleshooting, and FAQ for the Draw on Web Chrome extension." />
+  <meta name="theme-color" content="#ff6b35" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Support — Draw on Web" />
+  <meta property="og:description" content="Setup guide, keyboard shortcuts, troubleshooting, and FAQ for Draw on Web." />
+  <meta property="og:image" content="assets/icon-128.png" />
+
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/icon-16.png" />
+  <link rel="apple-touch-icon" href="assets/icon-128.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;550;600;650;700;750;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- ===================== NAV ===================== -->
+  <header class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="index.html">
+        <img src="assets/icon-48.png" alt="" />
+        Draw on Web
+      </a>
+
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="index.html#features">Features</a>
+        <a href="index.html#how">How it works</a>
+        <a href="index.html#shortcuts">Shortcuts</a>
+        <a href="support.html" class="active">Support</a>
+        <a href="privacy.html">Privacy</a>
+        <a class="nav-cta" data-store-link href="#">Add to Chrome</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="icon-btn theme-toggle" data-theme-toggle type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
+          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        </button>
+        <a class="btn btn-primary nav-cta nav-cta-desktop" data-store-link href="#">Add to Chrome</a>
+        <button class="icon-btn menu-toggle" data-menu-toggle type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================== HEADER ===================== -->
+  <header class="page-header">
+    <div class="container">
+      <span class="eyebrow">Support</span>
+      <h1>Help &amp; documentation</h1>
+      <p>Everything you need to install Draw on Web, learn the tools, fix common hiccups, and get in touch.</p>
+    </div>
+  </header>
+
+  <main id="main" class="section">
+    <div class="container">
+      <div class="prose">
+
+        <!-- QUICK LINKS -->
+        <div class="callout">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <p>Jump to: <a href="#install">Install</a> · <a href="#use">How to use</a> · <a href="#shortcuts">Shortcuts</a> · <a href="#troubleshooting">Troubleshooting</a> · <a href="#faq">FAQ</a> · <a href="#contact">Contact</a></p>
+        </div>
+
+        <!-- INSTALL -->
+        <h2 id="install">How to install</h2>
+        <p><strong>From the Chrome Web Store (recommended):</strong></p>
+        <ol>
+          <li>Open the <a data-store-link href="#">Draw on Web store listing</a>.</li>
+          <li>Click <strong>Add to Chrome</strong>, then <strong>Add extension</strong> in the confirmation dialog.</li>
+          <li>Click the puzzle-piece icon in Chrome's toolbar and <strong>pin</strong> Draw on Web for one-click access.</li>
+        </ol>
+
+        <p><strong>From source (load unpacked):</strong></p>
+        <ol>
+          <li>Open <code>chrome://extensions</code>.</li>
+          <li>Turn on <strong>Developer mode</strong> (top-right).</li>
+          <li>Click <strong>Load unpacked</strong> and select the folder containing <code>manifest.json</code>.</li>
+          <li>Pin it from the puzzle-piece menu. There's no build step — it loads as-is.</li>
+        </ol>
+
+        <div class="callout">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a10 10 0 1 0 10 10"/><path d="M12 6v6l4 2"/></svg>
+          <p>To draw on local <code>file://</code> pages, open <code>chrome://extensions</code> → Draw on Web → <strong>Details</strong> → enable <strong>Allow access to file URLs</strong>.</p>
+        </div>
+
+        <!-- HOW TO USE -->
+        <h2 id="use">How to use</h2>
+        <ol>
+          <li><strong>Turn it on.</strong> Click the Draw on Web toolbar icon, or press <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd> (<kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd> on Mac). A slim floating toolbar appears.</li>
+          <li><strong>Pick a tool.</strong> Choose the pen, highlighter, line, arrow, rectangle, ellipse, text, number stamp, or eraser from the bar — or press its hotkey.</li>
+          <li><strong>Set colour &amp; size.</strong> Click the colour dot to open the popover for colour, thickness, and opacity. A thickness slider also sits right on the bar (you can hide it in Settings). Each tool remembers its own thickness and opacity.</li>
+          <li><strong>Draw.</strong> Click and drag on the page. Hold <kbd>Shift</kbd> while drawing a rectangle, ellipse, or line to snap to a square, circle, or 45°.</li>
+          <li><strong>Add text.</strong> Pick the Text tool, click where you want it, and type. <kbd>Shift</kbd>+<kbd>Enter</kbd> makes a new line; <kbd>Enter</kbd> commits. Double-click text with the Select tool to re-edit it.</li>
+          <li><strong>Edit anything.</strong> Use Select to marquee or click strokes, drag to move them, and use the handles to resize. <kbd>Delete</kbd> or <kbd>Backspace</kbd> removes the selection.</li>
+          <li><strong>Use the site normally.</strong> Switch to <strong>Cursor mode</strong> (the cursor button, or press <kbd>C</kbd>) so clicks pass through to the page while your annotations stay visible and anchored.</li>
+          <li><strong>Move the toolbar.</strong> Drag it by the left grip, or collapse it to a small puck with the chevron. It remembers where you left it.</li>
+          <li><strong>Export.</strong> Click Export PNG to save the visible area, or switch to full-page export in Settings to capture every stroke across the whole document.</li>
+        </ol>
+
+        <div class="callout">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+          <p>New here? The first time you switch it on, a quick device picker and a short welcome tour walk you through everything. You can reopen the tour anytime from the <strong>?</strong> button on the toolbar.</p>
+        </div>
+
+        <h3>Settings</h3>
+        <p>Open Settings from the gear on the toolbar, or right-click the extension icon → <strong>Options</strong>. You can:</p>
+        <ul>
+          <li><strong>Tools</strong> — show or hide individual tools and drag to reorder them on the bar.</li>
+          <li><strong>Toolbar style</strong> — size (Compact / Regular / Large), corner shape (Sharp / Rounded / Pill), a custom colour with automatic text contrast, and the on-bar thickness-slider toggle.</li>
+          <li><strong>Defaults</strong> — starting tool, colour, thickness, opacity, toolbar position, and text font (Monospace, Sans-serif, Serif, Rounded, or Handwritten).</li>
+          <li><strong>Appearance</strong> — theme (Auto / Light / Dark) and accent colour.</li>
+          <li><strong>Behaviour</strong> — input device (Auto / Mouse / Trackpad / Touchscreen), pen smoothing (Off / Low / Medium / High), export mode, and auto-restore drawings per URL (off by default).</li>
+          <li><strong>Also</strong> — a keyboard-shortcuts reference, <strong>Clear saved drawings</strong>, and <strong>Reset to defaults</strong>.</li>
+        </ul>
+        <p>Settings sync via your Chrome account, so they follow you across your Chrome installs.</p>
+
+        <!-- SHORTCUTS -->
+        <h2 id="shortcuts">Keyboard shortcuts</h2>
+        <p>Available while Draw on Web is active on a page. Labels adapt to your platform (⌘ / ⌥ / ⇧ on macOS; Ctrl / Alt / Shift elsewhere).</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Action</th><th>Shortcut</th></tr></thead>
+            <tbody>
+              <tr><td class="t-name">Toggle draw mode</td><td><kbd>Ctrl/⌘</kbd> + <kbd>Shift</kbd> + <kbd>D</kbd></td></tr>
+              <tr><td class="t-name">Select</td><td><kbd>S</kbd></td></tr>
+              <tr><td class="t-name">Pen</td><td><kbd>P</kbd></td></tr>
+              <tr><td class="t-name">Highlighter</td><td><kbd>H</kbd></td></tr>
+              <tr><td class="t-name">Line</td><td><kbd>L</kbd></td></tr>
+              <tr><td class="t-name">Rectangle</td><td><kbd>R</kbd></td></tr>
+              <tr><td class="t-name">Ellipse</td><td><kbd>O</kbd></td></tr>
+              <tr><td class="t-name">Arrow</td><td><kbd>A</kbd></td></tr>
+              <tr><td class="t-name">Text</td><td><kbd>T</kbd></td></tr>
+              <tr><td class="t-name">Number stamp</td><td><kbd>N</kbd></td></tr>
+              <tr><td class="t-name">Eraser</td><td><kbd>E</kbd></td></tr>
+              <tr><td class="t-name">Filled rectangle <span class="t-note">(enable in Settings)</span></td><td><kbd>F</kbd></td></tr>
+              <tr><td class="t-name">Filled ellipse <span class="t-note">(enable in Settings)</span></td><td><kbd>G</kbd></td></tr>
+              <tr><td class="t-name">Cursor mode — use the site</td><td><kbd>C</kbd></td></tr>
+              <tr><td class="t-name">Undo</td><td><kbd>Ctrl/⌘</kbd> + <kbd>Z</kbd></td></tr>
+              <tr><td class="t-name">Redo</td><td><kbd>Ctrl/⌘</kbd> + <kbd>Shift</kbd> + <kbd>Z</kbd> &nbsp;or&nbsp; <kbd>Ctrl</kbd> + <kbd>Y</kbd></td></tr>
+              <tr><td class="t-name">Delete selection</td><td><kbd>Delete</kbd> / <kbd>Backspace</kbd></td></tr>
+              <tr><td class="t-name">Square / circle / 45°</td><td>hold <kbd>Shift</kbd> while drawing</td></tr>
+              <tr><td class="t-name">Change brush size</td><td>hold <kbd>Alt/⌥</kbd> and scroll the wheel</td></tr>
+              <tr><td class="t-name">Cancel · deselect · exit</td><td><kbd>Esc</kbd></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>The toggle shortcut can be rebound at <code>chrome://extensions/shortcuts</code>.</p>
+
+        <!-- TROUBLESHOOTING -->
+        <h2 id="troubleshooting">Troubleshooting</h2>
+
+        <h3>The toolbar doesn't appear on a page</h3>
+        <ul>
+          <li>Draw on Web can't run on Chrome's own system pages (<code>chrome://</code>, the Chrome Web Store, and the new-tab page) — that's a browser restriction, not a bug. Try it on a normal website.</li>
+          <li>If you just installed or reloaded the extension, the first toggle injects the scripts into already-open tabs. Toggle once more, or reload the page.</li>
+          <li>It only runs in the top frame of a page, not inside embedded iframes.</li>
+        </ul>
+
+        <h3>It won't work on a local file</h3>
+        <p>Enable <strong>Allow access to file URLs</strong> at <code>chrome://extensions</code> → Draw on Web → <strong>Details</strong>, then reload the file.</p>
+
+        <h3>My drawings disappeared after reloading</h3>
+        <p>Auto-restore is <strong>off by default</strong>, so annotations aren't re-loaded automatically when you revisit a page. Turn on <strong>Settings → Behaviour → Auto-restore drawings</strong> if you want them to persist per URL on your device. Export to PNG anytime to keep a permanent copy.</p>
+
+        <h3>The toolbar is in my way</h3>
+        <p>Drag it by the left grip to reposition it, or collapse it to a small puck with the chevron. Set a default position (and corner, size, colour) in Settings.</p>
+
+        <h3>Typing text triggered the website's shortcuts</h3>
+        <p>It shouldn't — Draw on Web shields key events while you're typing in its text tool. If you see this, make sure you clicked with the Text tool and are typing into the inline editor (not just on the page).</p>
+
+        <h3>Keyboard shortcut doesn't toggle draw mode</h3>
+        <p>Another extension may have claimed <kbd>Ctrl/⌘</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd>. Reassign it at <code>chrome://extensions/shortcuts</code>.</p>
+
+        <!-- FAQ -->
+        <h2 id="faq">Frequently asked questions</h2>
+        <div class="faq">
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false"><span>Is Draw on Web free?</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="m6 9 6 6 6-6"/></svg></button>
+            <div class="faq-a"><div class="faq-a-inner"><p>Yes — completely free, with no account, no sign-up, and no paid tiers.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false"><span>Do my annotations really stay with the page content?</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="m6 9 6 6 6-6"/></svg></button>
+            <div class="faq-a"><div class="faq-a-inner"><p>Yes. Strokes are stored in the page's own coordinate space rather than pinned to the screen, so they scroll with the content — through normal scrolling, infinite scroll, and single-page-app navigation, and even inside inner scroll areas like chat threads and doc panels.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false"><span>Are my drawings saved automatically?</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="m6 9 6 6 6-6"/></svg></button>
+            <div class="faq-a"><div class="faq-a-inner"><p>Auto-restore is off by default. You can enable it in <strong>Settings → Behaviour</strong> to have drawings saved per URL on your device and re-loaded when you revisit. Either way, you can export a PNG to keep a copy.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false"><span>Where are my drawings and settings stored?</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="m6 9 6 6 6-6"/></svg></button>
+            <div class="faq-a"><div class="faq-a-inner"><p>Settings sync through your own Chrome account so they follow you across installs. Drawings are stored locally on your device and never leave it. Nothing is sent to any server. See the <a href="privacy.html">Privacy Policy</a>.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false"><span>Why doesn't it work on some pages?</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="m6 9 6 6 6-6"/></svg></button>
+            <div class="faq-a"><div class="faq-a-inner"><p>Chrome blocks all extensions from running on its system pages (<code>chrome://</code>, the Web Store, the new-tab page). Draw on Web also runs only in the top frame, not inside iframes. On local <code>file://</code> pages, enable "Allow access to file URLs" in the extension's details.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false"><span>Can I use it with a touchscreen or stylus?</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="m6 9 6 6 6-6"/></svg></button>
+            <div class="faq-a"><div class="faq-a-inner"><p>Yes. It detects mouse, trackpad, and touch and adapts gestures and touch-target sizes to match — one finger draws, two fingers scroll, pinch-to-zoom passes through, and a resting hand is rejected while a stylus draws. You can also set the input device manually in Settings.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false"><span>How do I export my annotated page?</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="m6 9 6 6 6-6"/></svg></button>
+            <div class="faq-a"><div class="faq-a-inner"><p>Click <strong>Export PNG</strong> on the toolbar. The default captures the visible area; switch to <strong>Full page</strong> in Settings → Behaviour to render every stroke across the whole document into one image.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false"><span>Can I change or hide tools on the toolbar?</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="m6 9 6 6 6-6"/></svg></button>
+            <div class="faq-a"><div class="faq-a-inner"><p>Yes. In <strong>Settings → Tools</strong> you can show or hide any tool and drag to reorder them. The filled rectangle and filled ellipse are off by default and can be enabled there.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false"><span>How do I change the keyboard shortcut?</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="m6 9 6 6 6-6"/></svg></button>
+            <div class="faq-a"><div class="faq-a-inner"><p>The toggle shortcut (<kbd>Ctrl/⌘</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd>) can be rebound at <code>chrome://extensions/shortcuts</code>. The single-key tool hotkeys are fixed.</p></div></div>
+          </div>
+          <div class="faq-item">
+            <button class="faq-q" aria-expanded="false"><span>How do I remove all my saved drawings?</span><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="m6 9 6 6 6-6"/></svg></button>
+            <div class="faq-a"><div class="faq-a-inner"><p>Open the Options page and use <strong>Clear saved drawings</strong>, or <strong>Reset to defaults</strong> to also restore all settings. Uninstalling the extension removes all locally stored data.</p></div></div>
+          </div>
+        </div>
+
+        <!-- CONTACT -->
+        <h2 id="contact">Contact &amp; report a bug</h2>
+        <p>Found a bug, have a feature idea, or need a hand? Here's how to reach us.</p>
+        <div class="contact-grid">
+          <div class="card contact-card">
+            <div class="feature-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg></div>
+            <h3>Email us</h3>
+            <p><a data-email-link data-email-text href="#">loading…</a></p>
+          </div>
+          <div class="card contact-card">
+            <div class="feature-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg></div>
+            <h3>Report a bug</h3>
+            <p><a data-issues-link href="#">Open a GitHub issue</a></p>
+          </div>
+          <div class="card contact-card">
+            <div class="feature-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+            <h3>Enjoying it?</h3>
+            <p><a data-store-link href="#">Leave a review</a></p>
+          </div>
+        </div>
+
+        <div class="callout" style="margin-top:2em">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+          <p><strong>Filing a bug?</strong> Please include your Chrome version, the page or kind of site where it happened, what you expected, and what actually occurred. Screenshots help a lot.</p>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div>
+          <a class="brand" href="index.html"><img src="assets/icon-48.png" alt="" /> Draw on Web</a>
+          <p class="footer-about">Draw, highlight, and annotate on any web page. Your ink scrolls with the content, not the screen.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="index.html#features">Features</a></li>
+            <li><a href="index.html#how">How it works</a></li>
+            <li><a href="index.html#shortcuts">Shortcuts</a></li>
+            <li><a data-store-link href="#">Add to Chrome</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Help</h4>
+          <ul>
+            <li><a href="support.html">Support</a></li>
+            <li><a href="support.html#faq">FAQ</a></li>
+            <li><a href="support.html#troubleshooting">Troubleshooting</a></li>
+            <li><a data-issues-link href="#">Report a bug</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="privacy.html">Privacy Policy</a></li>
+            <li><a data-email-link href="#">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span data-year>2026</span> Draw on Web. Built with vanilla JS — no build step.</span>
+        <span>Not affiliated with Google. Chrome is a trademark of Google LLC.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>

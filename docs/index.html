@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Draw on Web — Draw, highlight & annotate on any web page</title>
+  <meta name="description" content="Draw on Web is a free Chrome extension to draw, highlight, and annotate on any web page. Your annotations scroll with the page content, not the screen." />
+  <meta name="theme-color" content="#ff6b35" />
+
+  <!-- Open Graph / social -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Draw on Web — Draw, highlight & annotate on any web page" />
+  <meta property="og:description" content="A free Chrome extension to draw, highlight, and annotate on any web page. Your ink scrolls with the content, not the screen." />
+  <meta property="og:image" content="assets/icon-128.png" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Draw on Web" />
+  <meta name="twitter:description" content="Draw, highlight & annotate on any web page. Your ink scrolls with the content." />
+
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/icon-16.png" />
+  <link rel="apple-touch-icon" href="assets/icon-128.png" />
+
+  <!-- Fonts (CDN, with system fallback in CSS) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;550;600;650;700;750;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- ===================== NAV ===================== -->
+  <header class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="index.html">
+        <img src="assets/icon-48.png" alt="" />
+        Draw on Web
+      </a>
+
+      <nav class="nav-links" id="nav-links" aria-label="Primary">
+        <a href="index.html#features">Features</a>
+        <a href="index.html#how">How it works</a>
+        <a href="index.html#shortcuts">Shortcuts</a>
+        <a href="support.html">Support</a>
+        <a href="privacy.html">Privacy</a>
+        <a class="nav-cta" data-store-link href="#">Add to Chrome</a>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="icon-btn theme-toggle" data-theme-toggle type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
+          <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+          <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        </button>
+        <a class="btn btn-primary nav-cta nav-cta-desktop" data-store-link href="#">Add to Chrome</a>
+        <button class="icon-btn menu-toggle" data-menu-toggle type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ===================== HERO ===================== -->
+    <section class="hero">
+      <div class="container">
+        <span class="pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15"><path d="M20 6 9 17l-5-5"/></svg>
+          Free · No account · No tracking
+        </span>
+        <h1>Draw on <span class="grad">any web page</span>, and your ink stays put</h1>
+        <p class="hero-sub">
+          Sketch, highlight, and annotate directly on top of whatever you're viewing. Every stroke is pinned to the page's own content — so it scrolls <em>with</em> the paragraph, not off the screen.
+        </p>
+        <div class="hero-cta">
+          <a class="btn btn-primary btn-lg" data-store-link href="#">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="21.17" y1="8" x2="12" y2="8"/><line x1="3.95" y1="6.06" x2="8.54" y2="14"/><line x1="10.88" y1="21.94" x2="15.46" y2="14"/></svg>
+            Add to Chrome — it's free
+          </a>
+          <a class="btn btn-ghost btn-lg" href="support.html">See how it works</a>
+        </div>
+        <p class="hero-note">Works on Chrome. Toggle anytime with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd> (<kbd>⌘</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd> on Mac).</p>
+
+        <!-- Hero visual: faux browser with a screenshot placeholder -->
+        <div class="mock reveal">
+          <div class="mock-bar">
+            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            <span class="url">https://your-favourite-article.com</span>
+          </div>
+          <!-- SCREENSHOT: replace this .shot block with <img src="assets/screenshot-hero.png" alt="Draw on Web annotating a web page"> (recommended 1280×720) -->
+          <div class="shot">
+            <div class="shot-inner">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>
+              <b>Add your hero screenshot here</b>
+              <span>Drop a 1280×720 PNG at <code>assets/screenshot-hero.png</code> and replace this placeholder block in <code>index.html</code>.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== FEATURES ===================== -->
+    <section class="section section-alt" id="features">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow">Features</span>
+          <h2>A full annotation toolkit, right in the page</h2>
+          <p>Everything here is built into the extension — no sign-up, no add-ons.</p>
+        </div>
+
+        <div class="grid grid-3">
+          <article class="card reveal">
+            <div class="feature-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg></div>
+            <h3>Ink that scrolls with content</h3>
+            <p>Strokes are stored in the page's coordinate space, so an arrow next to a paragraph stays there through scrolling, infinite scroll, and SPA navigation — even inside inner scroll areas like chat threads.</p>
+          </article>
+
+          <article class="card reveal">
+            <div class="feature-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg></div>
+            <h3>Pen, highlighter &amp; shapes</h3>
+            <p>Freehand pen, marker-style highlighter, line, arrow, rectangle, ellipse (outline or filled). Hold <kbd>Shift</kbd> to snap to a square, circle, or 45° line.</p>
+          </article>
+
+          <article class="card reveal">
+            <div class="feature-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg></div>
+            <h3>Smart multi-line text</h3>
+            <p>Click to place text, type inline, and it wraps to the window. Five font families, your own line breaks, and double-click to re-edit anything you've written.</p>
+          </article>
+
+          <article class="card reveal">
+            <div class="feature-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M11 9.5 12.5 8.5V16"/><path d="M11 16h3"/></svg></div>
+            <h3>Auto-numbered step stamps</h3>
+            <p>Drop markers that auto-increment (1, 2, 3…) — perfect for step-by-step callouts, tutorials, and design feedback.</p>
+          </article>
+
+          <article class="card reveal">
+            <div class="feature-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3a2 2 0 0 0-2 2"/><path d="M19 3a2 2 0 0 1 2 2"/><path d="M21 19a2 2 0 0 1-2 2"/><path d="M5 21a2 2 0 0 1-2-2"/><path d="M9 3h1M14 3h1M9 21h1M14 21h1M3 9v1M21 9v1M3 14v1M21 14v1"/></svg></div>
+            <h3>Select, move &amp; resize</h3>
+            <p>Nothing is locked once it's down. Marquee or click to select, drag to move, use handles to resize, and a stroke-level eraser removes whole marks cleanly.</p>
+          </article>
+
+          <article class="card reveal">
+            <div class="feature-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="7"/><path d="M12 6v4"/></svg></div>
+            <h3>Mouse, trackpad &amp; touch</h3>
+            <p>Detects how you point and tunes gestures and touch-target sizes to match — two-finger scroll, pinch-zoom pass-through, and palm rejection while a stylus draws.</p>
+          </article>
+
+          <article class="card reveal">
+            <div class="feature-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></div>
+            <h3>A toolbar you control</h3>
+            <p>A draggable, collapsible floating bar. Set its size, corner shape, colour, and position, choose which tools appear and in what order, and switch light / dark / auto themes.</p>
+          </article>
+
+          <article class="card reveal">
+            <div class="feature-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+            <h3>Export to PNG</h3>
+            <p>Save your annotated page as an image — the visible area, or a full-page render that captures every stroke across the whole document, even what's off-screen.</p>
+          </article>
+
+          <article class="card reveal">
+            <div class="feature-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+            <h3>Private by design</h3>
+            <p>No account, no servers, no tracking, no network requests. Settings sync through your own Chrome account; drawings stay on your device.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== HOW IT WORKS ===================== -->
+    <section class="section" id="how">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow">How it works</span>
+          <h2>From install to first stroke in under a minute</h2>
+        </div>
+
+        <div class="steps">
+          <div class="step reveal">
+            <span class="num">1</span>
+            <h3>Install</h3>
+            <p>Add Draw on Web to Chrome and pin it from the puzzle-piece menu for one-click access.</p>
+          </div>
+          <div class="step reveal">
+            <span class="num">2</span>
+            <h3>Toggle draw mode</h3>
+            <p>Open any page, click the icon or press <kbd>Ctrl/⌘</kbd>+<kbd>Shift</kbd>+<kbd>D</kbd>. A slim floating toolbar appears.</p>
+          </div>
+          <div class="step reveal">
+            <span class="num">3</span>
+            <h3>Pick a tool &amp; draw</h3>
+            <p>Choose pen, highlighter, a shape, text, or a step stamp, then draw right on the page.</p>
+          </div>
+          <div class="step reveal">
+            <span class="num">4</span>
+            <h3>Scroll, export, done</h3>
+            <p>Your marks stay anchored as you scroll. Switch to Cursor mode to use the site, or export a PNG.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SCREENSHOTS ===================== -->
+    <section class="section section-alt">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow">A look inside</span>
+          <h2>See it in action</h2>
+          <p>Swap these placeholders for real screenshots before you go live — see <code>docs/README.md</code>.</p>
+        </div>
+        <div class="grid grid-2">
+          <!-- SCREENSHOT: replace with <img src="assets/screenshot-toolbar.png" alt="..."> -->
+          <div class="card reveal" style="padding:0;overflow:hidden">
+            <div class="shot in-card">
+              <div class="shot-inner">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18"/></svg>
+                <b>The floating toolbar</b>
+                <span>Close-up of the tools, colour dot, and thickness slider.</span>
+              </div>
+            </div>
+          </div>
+          <!-- SCREENSHOT: replace with <img src="assets/screenshot-scroll.png" alt="..."> -->
+          <div class="card reveal" style="padding:0;overflow:hidden">
+            <div class="shot in-card">
+              <div class="shot-inner">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></svg>
+                <b>Annotations that stay anchored</b>
+                <span>Before/after scroll — ink stays next to the content.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SHORTCUTS ===================== -->
+    <section class="section" id="shortcuts">
+      <div class="container">
+        <div class="section-head reveal">
+          <span class="eyebrow">Keyboard shortcuts</span>
+          <h2>Fast by default</h2>
+          <p>Every tool has a single-key hotkey while Draw on Web is active. Full list on the <a href="support.html#shortcuts">Support page</a>.</p>
+        </div>
+
+        <div class="keys reveal">
+          <div class="key-row"><span>Toggle draw mode</span><span class="combo"><kbd>Ctrl/⌘</kbd><kbd>⇧</kbd><kbd>D</kbd></span></div>
+          <div class="key-row"><span>Pen</span><span class="combo"><kbd>P</kbd></span></div>
+          <div class="key-row"><span>Highlighter</span><span class="combo"><kbd>H</kbd></span></div>
+          <div class="key-row"><span>Line</span><span class="combo"><kbd>L</kbd></span></div>
+          <div class="key-row"><span>Arrow</span><span class="combo"><kbd>A</kbd></span></div>
+          <div class="key-row"><span>Rectangle</span><span class="combo"><kbd>R</kbd></span></div>
+          <div class="key-row"><span>Ellipse</span><span class="combo"><kbd>O</kbd></span></div>
+          <div class="key-row"><span>Text</span><span class="combo"><kbd>T</kbd></span></div>
+          <div class="key-row"><span>Number stamp</span><span class="combo"><kbd>N</kbd></span></div>
+          <div class="key-row"><span>Eraser</span><span class="combo"><kbd>E</kbd></span></div>
+          <div class="key-row"><span>Select</span><span class="combo"><kbd>S</kbd></span></div>
+          <div class="key-row"><span>Cursor mode (use the site)</span><span class="combo"><kbd>C</kbd></span></div>
+          <div class="key-row"><span>Undo</span><span class="combo"><kbd>Ctrl/⌘</kbd><kbd>Z</kbd></span></div>
+          <div class="key-row"><span>Redo</span><span class="combo"><kbd>Ctrl/⌘</kbd><kbd>⇧</kbd><kbd>Z</kbd></span></div>
+          <div class="key-row"><span>Delete selection</span><span class="combo"><kbd>Del</kbd></span></div>
+          <div class="key-row"><span>Cancel · deselect · exit</span><span class="combo"><kbd>Esc</kbd></span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== CTA ===================== -->
+    <section class="section">
+      <div class="container">
+        <div class="cta-band reveal">
+          <h2>Start annotating the web</h2>
+          <p>Free, private, and ready in a click. Add Draw on Web to Chrome and make any page your canvas.</p>
+          <a class="btn btn-primary btn-lg" data-store-link href="#">Add to Chrome</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== FOOTER ===================== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div>
+          <a class="brand" href="index.html"><img src="assets/icon-48.png" alt="" /> Draw on Web</a>
+          <p class="footer-about">Draw, highlight, and annotate on any web page. Your ink scrolls with the content, not the screen.</p>
+        </div>
+        <div class="footer-col">
+          <h4>Product</h4>
+          <ul>
+            <li><a href="index.html#features">Features</a></li>
+            <li><a href="index.html#how">How it works</a></li>
+            <li><a href="index.html#shortcuts">Shortcuts</a></li>
+            <li><a data-store-link href="#">Add to Chrome</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Help</h4>
+          <ul>
+            <li><a href="support.html">Support</a></li>
+            <li><a href="support.html#faq">FAQ</a></li>
+            <li><a href="support.html#troubleshooting">Troubleshooting</a></li>
+            <li><a data-issues-link href="#">Report a bug</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Legal</h4>
+          <ul>
+            <li><a href="privacy.html">Privacy Policy</a></li>
+            <li><a data-email-link href="#">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© <span data-year>2026</span> Draw on Web. Built with vanilla JS — no build step.</span>
+        <span>Not affiliated with Google. Chrome is a trademark of Google LLC.</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
