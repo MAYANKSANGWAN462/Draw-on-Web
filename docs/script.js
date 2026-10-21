@@ -16,7 +16,10 @@ window.DOW_CONFIG = {
   repoUrl: "https://github.com/MAYANKSANGWAN462/Draw-on-Web",
 
   // Support / privacy contact email.
-  email: "mayanksangwan462@gmail.com",
+  email: "sangwanmayank462@gmail.com",
+
+  // Instagram profile (shown as a social icon in the footer).
+  instagram: "https://www.instagram.com/mayanksangwan_77/",
 };
 
 (function () {
@@ -85,6 +88,11 @@ window.DOW_CONFIG = {
     document.querySelectorAll("[data-email-link]").forEach(function (a) {
       a.setAttribute("href", "mailto:" + cfg.email);
       if (a.hasAttribute("data-email-text")) a.textContent = cfg.email;
+    });
+    document.querySelectorAll("[data-instagram-link]").forEach(function (a) {
+      a.setAttribute("href", cfg.instagram);
+      a.setAttribute("target", "_blank");
+      a.setAttribute("rel", "noopener");
     });
 
     // FAQ accordion (one open at a time is not enforced — allow multiple)

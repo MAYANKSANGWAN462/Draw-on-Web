@@ -10,7 +10,9 @@
 ![Zero dependencies](https://img.shields.io/badge/dependencies-0-2ea44f)
 ![Works on](https://img.shields.io/badge/works%20on-mouse%20·%20trackpad%20·%20touch-8b5cf6)
 
-**[What's different](#-what-makes-it-different) · [Features](#-features) · [Get started](#-get-started) · [Tools](#-tools) · [Shortcuts](#-shortcuts--gestures) · [Settings](#-settings) · [Under the hood](#-under-the-hood)**
+[![Add to Chrome](https://img.shields.io/badge/Chrome%20Web%20Store-Add%20to%20Chrome-FF6B35?logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/ahodmhekhpcglhflceahakgojleklenc)
+
+**[⬇️ Add to Chrome](https://chromewebstore.google.com/detail/ahodmhekhpcglhflceahakgojleklenc) · [What's different](#-what-makes-it-different) · [Features](#-features) · [Get started](#-get-started) · [Tools](#-tools) · [Shortcuts](#-shortcuts--gestures) · [Settings](#-settings) · [Under the hood](#-under-the-hood) · [Links](#-links--contact)**
 
 </div>
 
@@ -53,14 +55,17 @@ Most pen extensions draw on a frozen layer over the screen. Draw on Web does thr
 
 ## 🚀 Get started
 
-**1. Install (load unpacked)**
+**1. Install**
 
-```text
-1. Open  chrome://extensions
-2. Turn on  Developer mode  (top-right)
-3. Click  Load unpacked  →  select this folder (the one with manifest.json)
-4. Pin it  (puzzle-piece icon → pin “Draw on Web”)
-```
+- **From the Chrome Web Store (recommended):** [**Add to Chrome →**](https://chromewebstore.google.com/detail/ahodmhekhpcglhflceahakgojleklenc), then pin it from the puzzle-piece menu.
+- **Load unpacked (for development):**
+
+  ```text
+  1. Open  chrome://extensions
+  2. Turn on  Developer mode  (top-right)
+  3. Click  Load unpacked  →  select this folder (the one with manifest.json)
+  4. Pin it  (puzzle-piece icon → pin “Draw on Web”)
+  ```
 
 > There's no build command — it loads directly as-is.
 
@@ -196,6 +201,8 @@ Strokes are stored in **document coordinates**, drawn with a low-latency (`desyn
 .
 ├── manifest.json                          MV3 manifest
 ├── README.md
+├── PRIVACY.md                             privacy policy
+├── docs/                                  support website (plain HTML/CSS/JS · hosted on Vercel)
 └── src/
     ├── background/service-worker.js        icon/keyboard toggle, screenshot capture, open options
     ├── content/
@@ -219,6 +226,16 @@ Strokes are stored in **document coordinates**, drawn with a low-latency (`desyn
 - Top frame only (not inside iframes).
 - **Visible area** export captures the current viewport; use **Full page** to export everything across the document.
 - Installing/reloading the extension while a tab is already open: the first toggle injects the scripts (a page reload also works).
+
+---
+
+## 🔗 Links & contact
+
+- **Chrome Web Store:** <https://chromewebstore.google.com/detail/ahodmhekhpcglhflceahakgojleklenc>
+- **Website & support:** the [`docs/`](docs/) folder, a plain HTML/CSS/JS site hosted on Vercel (set the project's **Root Directory** to `docs`). Replace with your live URL, e.g. `https://draw-on-web.vercel.app`.
+- **Privacy policy:** [`PRIVACY.md`](PRIVACY.md) — also served at `/privacy.html` on the website.
+- **Email:** sangwanmayank462@gmail.com
+- **Instagram:** <https://www.instagram.com/mayanksangwan_77/>
 
 ---
 

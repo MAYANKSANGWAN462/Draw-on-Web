@@ -36,7 +36,8 @@ top of **`script.js`**:
 window.DOW_CONFIG = {
   storeUrl: "https://chromewebstore.google.com/detail/ahodmhekhpcglhflceahakgojleklenc",
   repoUrl:  "https://github.com/MAYANKSANGWAN462/Draw-on-Web",
-  email:    "mayanksangwan462@gmail.com",
+  email:    "sangwanmayank462@gmail.com",
+  instagram:"https://www.instagram.com/mayanksangwan_77/",
 };
 ```
 
