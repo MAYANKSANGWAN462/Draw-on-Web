@@ -320,7 +320,7 @@ p { margin: 0 0 1rem; }
 .hero-cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
 .hero-note { margin-top: 18px; font-size: 0.92rem; color: var(--text-faint); }
 
-/* Faux browser mock for the hero visual / screenshots */
+/* Faux browser mock that frames the hero illustration */
 .mock {
   margin-top: 56px;
   border-radius: var(--radius-lg);
@@ -356,28 +356,18 @@ p { margin: 0 0 1rem; }
   font-family: var(--mono);
 }
 
-/* Reusable screenshot placeholder */
-.shot {
-  position: relative;
-  aspect-ratio: 16 / 9;
-  display: grid;
-  place-items: center;
-  text-align: center;
-  padding: 24px;
-  color: var(--text-faint);
-  background:
-    repeating-linear-gradient(45deg, var(--bg-alt), var(--bg-alt) 14px, var(--bg) 14px, var(--bg) 28px);
-}
-.shot-inner {
-  display: grid;
-  gap: 10px;
-  justify-items: center;
-  max-width: 420px;
-}
-.shot svg { width: 42px; height: 42px; color: var(--brand); opacity: 0.8; }
-.shot b { color: var(--text-dim); font-size: 1rem; }
-.shot span { font-size: 0.86rem; }
-.shot.in-card { border-radius: var(--radius); border: 1px dashed var(--border-strong); overflow: hidden; }
+/* Hero illustration — a pure-SVG "annotated page" scene, theme-aware */
+.hero-art { padding: 26px 24px; background: var(--bg-alt); }
+.hero-art svg { width: 100%; height: auto; display: block; }
+.ink-strong { fill: var(--text); opacity: 0.85; }
+.ink-line { fill: var(--border-strong); }
+.ink-hi { fill: var(--brand); opacity: 0.22; }
+.ink-stroke { fill: none; stroke: var(--brand); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+.ink-stroke.thin { stroke-width: 3; }
+.ink-bar { fill: var(--bg-elevated); stroke: var(--border); stroke-width: 1.5; }
+.ink-dot { fill: var(--text-faint); }
+.ink-dot.active { fill: var(--brand); }
+.ink-color { fill: var(--brand); }
 
 /* ---- Feature grid -------------------------------------------------------- */
 .grid { display: grid; gap: 22px; }

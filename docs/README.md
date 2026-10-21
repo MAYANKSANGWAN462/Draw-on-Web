@@ -20,7 +20,7 @@ extension's own zero-dependency philosophy.
 
 | File | What it is |
 |------|------------|
-| `index.html` | Landing page — hero, features, how-it-works, screenshots, shortcuts, CTA. |
+| `index.html` | Landing page — hero, features, how-it-works, shortcuts, CTA. |
 | `support.html` | Install guide, how-to, shortcuts table, troubleshooting, FAQ, contact. |
 | `privacy.html` | Privacy Policy (mirrors the repo's `PRIVACY.md`). |
 | `styles.css` | All styling and the light/dark design tokens. |
@@ -48,18 +48,18 @@ window.DOW_CONFIG = {
 Change these three values and every button across all pages updates
 automatically.
 
-## 🖼️ Adding real screenshots
+## 🖼️ Screenshots (optional, added later)
 
-The homepage uses striped placeholder blocks (class `shot`) where screenshots
-should go. To swap one in:
+There are **no screenshots** right now. The hero uses a self-contained SVG
+illustration (`.hero-art` in `index.html` / `styles.css`), so the page looks
+complete without any images.
 
-1. Save a PNG into `assets/` (e.g. `assets/screenshot-hero.png`,
-   recommended 1280×720).
-2. In `index.html`, find the matching `<!-- SCREENSHOT: ... -->` comment and
-   replace the `<div class="shot">…</div>` block with:
-   ```html
-   <img src="assets/screenshot-hero.png" alt="Draw on Web annotating a web page" />
-   ```
+If you want to add a real screenshot later, drop a PNG into `assets/` and place
+an `<img>` where you want it, e.g. inside the hero's `.mock`:
+
+```html
+<img src="assets/screenshot-hero.png" alt="Draw on Web annotating a web page" />
+```
 
 ## 👀 Preview locally
 
